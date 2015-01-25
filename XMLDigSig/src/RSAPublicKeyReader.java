@@ -11,10 +11,12 @@ public class RSAPublicKeyReader {
 	 * @throws Exception InvalidKeyFormat
 	 */
 	public static PublicKey getPubKeyFormFile(String filename) throws Exception{
-		
+		PublicKey pubKey = null;
 		File f = new File(filename);
 		FileInputStream fis = null;
 		byte[] keyBytes = null;
+		KeyFactory kf = null;
+		X509EncodedKeySpec spec = null;
 		try {
 			fis = new FileInputStream(f);
 			
@@ -23,7 +25,15 @@ public class RSAPublicKeyReader {
 				keyBytes = new byte[(int)f.length()];
 				dis.readFully(keyBytes);
 				
-			} catch (Exception e) { e.printStackTrace(); } 
+				spec = new X509EncodedKeySpec(keyBytes);
+				//Generate public key
+				kf = KeyFactory.getInstance("RSA");
+				
+				try {
+					pubKey = kf.generatePublic(spec);
+				} catch (Exception e) { throw new Exception("Couldn't fide a valid Public Key ");}
+				
+			} catch (Exception e) {e.printStackTrace();   } 
 			
 		} catch (IOException e){
 			// handle exception
@@ -43,10 +53,8 @@ public class RSAPublicKeyReader {
 		
 		
 		//X509 Encoding
-		X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
-		//Generate public key
-		KeyFactory kf = KeyFactory.getInstance("RSA");
-		return kf.generatePublic(spec);
+		
+		return pubKey;
 		
 
 		
