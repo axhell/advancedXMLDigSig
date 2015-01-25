@@ -1,4 +1,4 @@
-	import javax.xml.crypto.*;
+import javax.xml.crypto.*;
 import javax.xml.crypto.dsig.*;
 import javax.xml.crypto.dom.*;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
@@ -10,6 +10,7 @@ import javax.xml.crypto.dsig.spec.XPathType;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.security.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,12 +28,10 @@ import org.w3c.dom.Document;
 	 *
 	 */
 	public class GenDetachedBuilder {
-		/*private String pubkfilename;
-		private String privkfilename;*/
-		private String xmlfilename;
-		private File pubkfile;
-		private File privkfile;
-		private File targetfile;
+		private PublicKey pubkfile;
+		private PrivateKey privkfile;
+		//private File targetfile;
+		private String targetURI;
 		
 		/**
 		 * This builder is a input collector used to generate a detached signature
@@ -40,37 +39,34 @@ import org.w3c.dom.Document;
 		 * @param priv , private key file
 		 * @param tar , target file to be signed
 		 */
-		public GenDetachedBuilder(File pub, File priv, String tar){
+		public GenDetachedBuilder(PublicKey pub, PrivateKey priv, String tar){
 			this.pubkfile = pub;
 			this.privkfile = priv;
-			this.xmlfilename = tar;
-		}
-		
-		public GenDetachedBuilder(){
-			this.pubkfile = null;
-			this.privkfile = null;
-			this.xmlfilename = "";
+			this.targetURI = tar;
 		}
 		
 		
 		
-		public void GenerateSig(GenDetachedBuilder G) throws Exception {
+		
+		public void GenerateSig() throws Exception {
 	    	
 	    	
-	    	File filePrivK = G.privkfile;
-	    	PrivateKey privKey = RSAPrivateKeyReader.getPrivKeyFromFile(filePrivK);
-			//debug for private key content
+	    	//File filePrivK = G.privkfile;
+	    	//PrivateKey privKey = RSAPrivateKeyReader.getPrivKeyFromFile(filePrivK);
+	    	PrivateKey privKey = this.privkfile;
+	    	//debug for private key content
 			System.out.println("Private key content: ");
 			System.out.println(privKey);
 			
-			File filePubK = G.pubkfile;
-	    	PublicKey pubKey = RSAPublicKeyReader.getPubKeyFormFile(filePubK);
+			//File filePubK = G.pubkfile;
+	    	//PublicKey pubKey = RSAPublicKeyReader.getPubKeyFormFile(filePubK);
+	    	PublicKey pubKey = this.pubkfile;
 			//Test for public key content
 			System.out.println("Public key content: ");
 			System.out.println(pubKey);
 	    	
 			//target file to be signed
-			String target = G.xmlfilename;
+			
 			
 			
 			/*//JAXP parser
@@ -90,11 +86,12 @@ import org.w3c.dom.Document;
 
 	        // Create a Reference to an external URI that will be digested
 	        // using the SHA1 digest algorithm
+	        //URI note file:///~/advancedXMLDigSig/ 
 	        List<XPathType> xpaths = new ArrayList<XPathType>();
 	        xpaths.add(new XPathType("//.", XPathType.Filter.INTERSECT));
 
 	        Reference ref = fac.newReference
-	          (target, fac.newDigestMethod(DigestMethod.SHA1, null),
+	          (this.targetURI, fac.newDigestMethod(DigestMethod.SHA1, null),
 	                Collections.singletonList
 	                  (fac.newTransform(Transform.XPATH2, 
 	                          new XPathFilter2ParameterSpec(xpaths))),
