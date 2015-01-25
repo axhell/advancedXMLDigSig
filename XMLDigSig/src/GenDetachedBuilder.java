@@ -4,12 +4,18 @@ import javax.xml.crypto.dom.*;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.*;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.crypto.dsig.spec.XPathFilter2ParameterSpec;
+import javax.xml.crypto.dsig.spec.XPathType;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.security.*;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
@@ -22,8 +28,8 @@ import org.w3c.dom.Document;
 	 */
 	public class GenDetachedBuilder {
 		/*private String pubkfilename;
-		private String privkfilename;
-		private String xmlfilename;*/
+		private String privkfilename;*/
+		private String xmlfilename;
 		private File pubkfile;
 		private File privkfile;
 		private File targetfile;
@@ -34,10 +40,16 @@ import org.w3c.dom.Document;
 		 * @param priv , private key file
 		 * @param tar , target file to be signed
 		 */
-		public GenDetachedBuilder(File pub, File priv, File tar){
+		public GenDetachedBuilder(File pub, File priv, String tar){
 			this.pubkfile = pub;
 			this.privkfile = priv;
-			this.targetfile = tar;
+			this.xmlfilename = tar;
+		}
+		
+		public GenDetachedBuilder(){
+			this.pubkfile = null;
+			this.privkfile = null;
+			this.xmlfilename = "";
 		}
 		
 		
@@ -58,7 +70,19 @@ import org.w3c.dom.Document;
 			System.out.println(pubKey);
 	    	
 			//target file to be signed
-			File target = G.targetfile;
+			String target = G.xmlfilename;
+			
+			
+			/*//JAXP parser
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			//namespace-aware
+			dbf.setNamespaceAware(true);
+			
+			DocumentBuilder builder = dbf.newDocumentBuilder();
+			
+			//Parse the input file
+			Document doc = builder.parse(target);*/ 
+			//Create signature context
 
 	        // First, create a DOM XMLSignatureFactory that will be used to
 	        // generate the XMLSignature and marshal it to DOM.
@@ -66,8 +90,21 @@ import org.w3c.dom.Document;
 
 	        // Create a Reference to an external URI that will be digested
 	        // using the SHA1 digest algorithm
-	        Reference ref = fac.newReference("http://www.w3.org/TR/xml-stylesheet", fac.newDigestMethod(DigestMethod.SHA1, null));
-	        //serve xpath2 filter
+	        List<XPathType> xpaths = new ArrayList<XPathType>();
+	        xpaths.add(new XPathType("//.", XPathType.Filter.INTERSECT));
+
+	        Reference ref = fac.newReference
+	          (target, fac.newDigestMethod(DigestMethod.SHA1, null),
+	                Collections.singletonList
+	                  (fac.newTransform(Transform.XPATH2, 
+	                          new XPathFilter2ParameterSpec(xpaths))),
+	                     null, null); 
+
+	        /*<XPath Filter="intersect" xmlns="http://www.w3.org/2002/06/xmldsig-filter2">
+      			//.
+   			  </XPath>*/
+	        	        
+	        
 	        // Create the SignedInfo
 	        SignedInfo si = fac.newSignedInfo(
 	            fac.newCanonicalizationMethod
@@ -78,7 +115,7 @@ import org.w3c.dom.Document;
 
 	      
 
-	        // Create a KeyValue containing the DSA PublicKey that was generated
+	        // Create a KeyValue containing the RSA PublicKey that was generated
 	        KeyInfoFactory kif = fac.getKeyInfoFactory();
 	        KeyValue kv = kif.newKeyValue(pubKey);
 
@@ -89,14 +126,14 @@ import org.w3c.dom.Document;
 	        XMLSignature signature = fac.newXMLSignature(si, ki);
 
 	        // Create the Document that will hold the resulting XMLSignature
-	        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-	        dbf.setNamespaceAware(true); // must be set
-	        Document doc = dbf.newDocumentBuilder().newDocument();
+	        DocumentBuilderFactory sigdbf = DocumentBuilderFactory.newInstance();
+	        sigdbf.setNamespaceAware(true); // must be set
+	        Document sigdoc = sigdbf.newDocumentBuilder().newDocument();
 
 	        // Create a DOMSignContext and set the signing Key to the RSA
 	        // PrivateKey and specify where the XMLSignature should be inserted
 	        // in the target document (in this case, the document root)
-	        DOMSignContext signContext = new DOMSignContext(privKey, doc);
+	        DOMSignContext signContext = new DOMSignContext(privKey, sigdoc);
 
 	        // Marshal, generate (and sign) the detached XMLSignature. The DOM
 	        // Document will contain the XML Signature if this method returns
@@ -113,7 +150,12 @@ import org.w3c.dom.Document;
 
 	        TransformerFactory tf = TransformerFactory.newInstance();
 	        Transformer trans = tf.newTransformer();
-	        trans.transform(new DOMSource(doc), new StreamResult(os));
+	        trans.transform(new DOMSource(sigdoc), new StreamResult(os));
 	    }
+
+		public void setPubKey(String string) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 
