@@ -19,21 +19,21 @@ public class TestDigSig {
 		String target = null;
 		
 		if (args[0] != null){
-			System.out.println("Public Key input field MUST NOT be empty");
-		}else{
 			pubKey = RSAPublicKeyReader.getPubKeyFormFile(args[0]);
+		}else{
+			System.out.println("Public Key input field MUST NOT be empty");
 		}
 		
 		if (args[1] != null){
-			System.out.println("Private Key input field MUST NOT be empty");
-		}else{
 			privKey = RSAPrivateKeyReader.getPrivKeyFromFile(args[1]);
+		}else{
+			System.out.println("Private Key input field MUST NOT be empty");
 		}
 		
 		if (args[2] != null){
-			System.out.println("Target of signature URI field MUST NOT be empty");
-		}else{
 			target = args[2];
+		}else{
+			System.out.println("Target of signature URI field MUST NOT be empty");
 		}
 		
 		
