@@ -30,7 +30,6 @@ import org.w3c.dom.Document;
 	public class GenDetachedBuilder {
 		private PublicKey pubkfile;
 		private PrivateKey privkfile;
-		//private File targetfile;
 		private String targetURI;
 		
 		/**
@@ -88,7 +87,7 @@ import org.w3c.dom.Document;
 	        // using the SHA1 digest algorithm
 	        //URI note file:///~/advancedXMLDigSig/ 
 	        List<XPathType> xpaths = new ArrayList<XPathType>();
-	        xpaths.add(new XPathType("//.", XPathType.Filter.INTERSECT));
+	        xpaths.add(new XPathType("/", XPathType.Filter.INTERSECT));
 
 	        Reference ref = fac.newReference
 	          (this.targetURI, fac.newDigestMethod(DigestMethod.SHA1, null),

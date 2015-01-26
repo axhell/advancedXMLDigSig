@@ -72,28 +72,47 @@ public class RSAPrivateKeyReader {
 	 */
 	public static PrivateKey getPrivKeyFromFile(File f) throws Exception {
 		
-		//File f = new File(filename);
-		//debug
-		BufferedReader br = new BufferedReader(new FileReader(f));
-		String line = null;
-		System.out.println("(RSAPrivateKeyReader.class)Private key content befor encoding: ");
-		while ((line = br.readLine()) != null){
-			System.out.println(line);
+		
+		FileInputStream fis = null;
+		byte[] keyBytes = null;
+		KeyFactory kf = null;
+		PKCS8EncodedKeySpec spec = null;
+		PrivateKey privKey = null;
+		
+		
+		try {
+			fis = new FileInputStream(f);
+			try {
+				DataInputStream dis = new DataInputStream(fis);
+				keyBytes = new byte[(int)f.length()];
+				dis.readFully(keyBytes);
+				dis.close();
+				
+				
+				//PKCS8 encoding
+				spec = new PKCS8EncodedKeySpec(keyBytes);
+				//Generate the private key
+				kf = KeyFactory.getInstance("RSA");
+				
+				try {
+					privKey = kf.generatePrivate(spec);
+				}catch (Exception e) { throw new Exception("Private Key file is not valid");}
+			
+			} catch (IOException e){ e.printStackTrace();}
+		}finally { 
+		    try {
+		        
+				if (fis != null) {
+		            fis.close();
+		        }        
+		    } catch (IOException e) {
+		        // handle exception
+		    	e.printStackTrace();
+		    }
 		}
-		//fine test
-		FileInputStream fis = new FileInputStream(f);
-		DataInputStream dis = new DataInputStream(fis);
-		byte[] keyBytes = new byte[(int)f.length()];
-		dis.readFully(keyBytes);
-		dis.close();
-		br.close();
 		
-		//PKCS8 encoding
-		PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-		//Generate the private key
-		KeyFactory kf = KeyFactory.getInstance("RSA");
 		
-		return kf.generatePrivate(spec);
+		return privKey;
 	}
 	
 	

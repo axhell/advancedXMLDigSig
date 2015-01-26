@@ -25,6 +25,14 @@ public class RSAPublicKeyReader {
 				DataInputStream dis = new DataInputStream(fis);
 				keyBytes = new byte[(int)f.length()];
 				dis.readFully(keyBytes);
+				try {
+			        
+					if (dis != null) {
+			            dis.close();
+					}
+			    } catch (IOException e) {
+				        // handle exception
+				    	e.printStackTrace();}
 				
 				spec = new X509EncodedKeySpec(keyBytes);
 				//Generate public key
@@ -78,6 +86,14 @@ public class RSAPublicKeyReader {
 				DataInputStream dis = new DataInputStream(fis);
 				keyBytes = new byte[(int)f.length()];
 				dis.readFully(keyBytes);
+				try {
+			        
+					if (dis != null) {
+			            dis.close();
+					}
+			    } catch (IOException e) {
+				        // handle exception
+				    	e.printStackTrace();}
 				
 				spec = new X509EncodedKeySpec(keyBytes);
 				//Generate public key
