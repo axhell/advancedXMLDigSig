@@ -16,32 +16,33 @@ public class TestDigSig {
 		PrivateKey privKey = null;
 		String target = null;
 		
-		if (args.length > 0 && args[0].length() > 0){
-			pubKey = RSAPublicKeyReader.getPubKeyFormFile(args[0]);
-		}else{
-			System.out.println("Public Key input field MUST NOT be empty");
-		}
-		
-		if (args.length > 1 && args[1] != null){
-			privKey = RSAPrivateKeyReader.getPrivKeyFromFile(args[1]);
-		}else{
-			System.out.println("Private Key input field MUST NOT be empty");
-		}
-		
-		if (args.length > 2 && args[2] != null){
-			target = args[2];
-		}else{
-			System.out.println("Target of signature URI field MUST NOT be empty");
-		}
-		
-		
-		if (args.length == 3){
+		if (args.length == 4 && args[0].equalsIgnoreCase("-s")){
+			pubKey = RSAPublicKeyReader.getPubKeyFormFile(args[1]);
+			privKey = RSAPrivateKeyReader.getPrivKeyFromFile(args[2]);
+			target = args[3];
 			GenDetachedBuilder inputs = new GenDetachedBuilder(pubKey, privKey, target);
 			inputs.GenerateSig();
-		}
+			
+		}else if (args.length == 3 && args[0].equalsIgnoreCase("-v")){
+			pubKey = RSAPublicKeyReader.getPubKeyFormFile(args[1]);
+			target = args[2];
+			ValidateSignature input = new ValidateSignature(pubKey, target);
+			input.Validate();
+		
+		}else
+			PrintUsage();
 		
 		
 
+	}
+
+	private static void PrintUsage() {
+		// TODO Auto-generated method stub
+		
+		System.out.println("usage: TestDigSig [COMMAND] [INPUT]");
+		System.out.println("option: ");
+		System.out.println("-s <PublicKey file> <PrivarteKey file> <URI> : generate detached digital signature of the target URI");
+		System.out.println("-v <PublicKey file> <URI> : validate digital signature in the target URI");
 	}
 
 }
