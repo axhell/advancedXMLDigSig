@@ -50,22 +50,22 @@ import org.w3c.dom.Document;
 		public void GenerateSig() throws Exception {
 	    	
 	    	
-	    	//File filePrivK = G.privkfile;
-	    	//PrivateKey privKey = RSAPrivateKeyReader.getPrivKeyFromFile(filePrivK);
+	    	
 	    	PrivateKey privKey = this.privkfile;
 	    	//debug for private key content
 			System.out.println("Private key content: ");
 			System.out.println(privKey);
 			
-			//File filePubK = G.pubkfile;
-	    	//PublicKey pubKey = RSAPublicKeyReader.getPubKeyFormFile(filePubK);
+			
 	    	PublicKey pubKey = this.pubkfile;
 			//Test for public key content
 			System.out.println("Public key content: ");
 			System.out.println(pubKey);
 	    	
 			//target file to be signed
-			
+			//this.targetURI
+			//final X509Certificate cert = CertUtil.loadCertificate(new BufferedInputStream(new FileInputStream(args[0]))); 
+			//final KeyPair kp = new KeyPair(cert.getPublicKey(), key.getPrivateKey());
 			
 			
 			/*//JAXP parser
@@ -79,7 +79,7 @@ import org.w3c.dom.Document;
 			Document doc = builder.parse(target);*/ 
 			//Create signature context
 
-	        // First, create a DOM XMLSignatureFactory that will be used to
+	        // DOM XMLSignatureFactory that will be used to
 	        // generate the XMLSignature and marshal it to DOM.
 	        XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
 
@@ -87,27 +87,36 @@ import org.w3c.dom.Document;
 	        // using the SHA1 digest algorithm
 	        //URI note file:///~/advancedXMLDigSig/ 
 	        List<XPathType> xpaths = new ArrayList<XPathType>();
-	        xpaths.add(new XPathType("/", XPathType.Filter.INTERSECT));
-
+	        xpaths.add(new XPathType("/*", XPathType.Filter.INTERSECT));
+	        
 	        Reference ref = fac.newReference
+	  	          (this.targetURI, fac.newDigestMethod(DigestMethod.SHA1, null),
+	  	                Collections.singletonList
+	  	                  (fac.newTransform(Transform.XPATH2, 
+	  	                          new XPathFilter2ParameterSpec(xpaths))), null, null); 
+
+	        List<Reference> ref2 = Collections.singletonList(fac.newReference
 	          (this.targetURI, fac.newDigestMethod(DigestMethod.SHA1, null),
 	                Collections.singletonList
 	                  (fac.newTransform(Transform.XPATH2, 
-	                          new XPathFilter2ParameterSpec(xpaths))), null, null); 
+	                          new XPathFilter2ParameterSpec(xpaths))), null, null)); 
 
 	        /*<XPath Filter="intersect" xmlns="http://www.w3.org/2002/06/xmldsig-filter2">
       			//.
    			  </XPath>*/
 	        	        
+	        //Manifest with reference URI
+	        Manifest manifest = fac.newManifest(ref2, "manifest-1");
 	        
 	        // Create the SignedInfo
 	        SignedInfo si = fac.newSignedInfo(
 	            fac.newCanonicalizationMethod
-	                (CanonicalizationMethod.XPATH2,
+	                (CanonicalizationMethod.INCLUSIVE,
 	                 (C14NMethodParameterSpec) null),
 	            fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null),
 	            Collections.singletonList(ref));
 
+	        //throws XMLSecurityException
 	      
 
 	        // Create a KeyValue containing the RSA PublicKey that was generated
@@ -133,6 +142,7 @@ import org.w3c.dom.Document;
 	        // Marshal, generate (and sign) the detached XMLSignature. The DOM
 	        // Document will contain the XML Signature if this method returns
 	        // successfully.
+	        //signContext.setURIDereferencer(new MyURIDereferencer(ref));
 	        signature.sign(signContext);
 
 	        // output the resulting document
