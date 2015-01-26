@@ -93,8 +93,7 @@ import org.w3c.dom.Document;
 	          (this.targetURI, fac.newDigestMethod(DigestMethod.SHA1, null),
 	                Collections.singletonList
 	                  (fac.newTransform(Transform.XPATH2, 
-	                          new XPathFilter2ParameterSpec(xpaths))),
-	                     null, null); 
+	                          new XPathFilter2ParameterSpec(xpaths))), null, null); 
 
 	        /*<XPath Filter="intersect" xmlns="http://www.w3.org/2002/06/xmldsig-filter2">
       			//.
