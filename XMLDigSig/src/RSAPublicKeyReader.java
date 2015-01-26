@@ -17,6 +17,7 @@ public class RSAPublicKeyReader {
 		byte[] keyBytes = null;
 		KeyFactory kf = null;
 		X509EncodedKeySpec spec = null;
+		
 		try {
 			fis = new FileInputStream(f);
 			
