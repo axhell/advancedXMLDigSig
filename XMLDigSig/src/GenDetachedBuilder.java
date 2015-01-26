@@ -1,6 +1,6 @@
-import javax.xml.crypto.*;
+
 import javax.xml.crypto.dsig.*;
-import javax.xml.crypto.dom.*;
+
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.*;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
@@ -10,13 +10,12 @@ import javax.xml.crypto.dsig.spec.XPathType;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.net.URI;
+
 import java.security.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
@@ -147,20 +146,14 @@ import org.w3c.dom.Document;
 
 	        // output the resulting document
 	        OutputStream os;
-	        /*if (args.length > 0) {
-	           os = new FileOutputStream(args[0]);
-	        } else {*/
-	           os = System.out;
-	        //}
+	        os = new FileOutputStream("." + File.separator + "Signature");
+	
+	        
 
 	        TransformerFactory tf = TransformerFactory.newInstance();
 	        Transformer trans = tf.newTransformer();
 	        trans.transform(new DOMSource(sigdoc), new StreamResult(os));
 	    }
 
-		public void setPubKey(String string) {
-			// TODO Auto-generated method stub
-			
-		}
 	}
 
