@@ -48,7 +48,7 @@ import org.w3c.dom.Document;
 		
 		
 		
-		public void GenerateSig() throws Exception {
+		public Document GenerateSig() throws Exception {
 	    	
 	    	
 	    	
@@ -72,81 +72,85 @@ import org.w3c.dom.Document;
 
 	        // DOM XMLSignatureFactory that will be used to
 	        // generate the XMLSignature and marshal it to DOM.
-	        XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
-
-	        // Create a Reference to an external URI that will be digested
-	        // using the SHA1 digest algorithm
-	        //URI note file:///~/advancedXMLDigSig/ 
-	        List<XPathType> xpaths = new ArrayList<XPathType>();
-	        xpaths.add(new XPathType("/*", XPathType.Filter.INTERSECT));
-	        
-	        Reference ref = fac.newReference
-	  	          (this.targetURI, fac.newDigestMethod(DigestMethod.SHA1, null),
-	  	                Collections.singletonList
-	  	                  (fac.newTransform(Transform.XPATH2, 
-	  	                          new XPathFilter2ParameterSpec(xpaths))), null, null); 
-
-	        List<Reference> ref2 = Collections.singletonList(fac.newReference
-	          (this.targetURI, fac.newDigestMethod(DigestMethod.SHA1, null),
-	                Collections.singletonList
-	                  (fac.newTransform(Transform.XPATH2, 
-	                          new XPathFilter2ParameterSpec(xpaths))), null, null)); 
-
-	        /*<XPath Filter="intersect" xmlns="http://www.w3.org/2002/06/xmldsig-filter2">
-      			//.
-   			  </XPath>*/
-	        	        
-	        //Manifest with reference URI
-	        Manifest manifest = fac.newManifest(ref2, "manifest-1");
-	        
-	        // Create the SignedInfo
-	        SignedInfo si = fac.newSignedInfo(
-	            fac.newCanonicalizationMethod
-	                (CanonicalizationMethod.INCLUSIVE,
-	                 (C14NMethodParameterSpec) null),
-	            fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null),
-	            Collections.singletonList(ref));
-
-	        //throws XMLSecurityException
-	      
-
-	        // Create a KeyValue containing the RSA PublicKey that was generated
-	        KeyInfoFactory kif = fac.getKeyInfoFactory();
-	        KeyValue kv = kif.newKeyValue(pubKey);
-
-	        // Create a KeyInfo and add the KeyValue to it
-	        KeyInfo ki = kif.newKeyInfo(Collections.singletonList(kv));
-
-	        // Create the XMLSignature (but don't sign it yet)
-	        XMLSignature signature = fac.newXMLSignature(si, ki);
-
-	        // Create the Document that will hold the resulting XMLSignature
-	        DocumentBuilderFactory sigdbf = DocumentBuilderFactory.newInstance();
-	        sigdbf.setNamespaceAware(true); // must be set
-	        Document sigdoc = sigdbf.newDocumentBuilder().newDocument();
-
-	        // Create a DOMSignContext and set the signing Key to the RSA
-	        // PrivateKey and specify where the XMLSignature should be inserted
-	        // in the target document (in this case, the document root)
-	        DOMSignContext signContext = new DOMSignContext(privKey, sigdoc);
-
-	        // Marshal, generate (and sign) the detached XMLSignature. The DOM
-	        // Document will contain the XML Signature if this method returns
-	        // successfully.
-	        //FileInputStream fis = new FileInputStream(this.targetURI);
-	        //signContext.setURIDereferencer(new MyURIDereferencer(fis));
-	        signature.sign(signContext);
-
-	        // output the resulting document
-	        OutputStream os;
-	        os = new FileOutputStream("." + File.separator + "Signature");
+		
+				XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
 	
-	        
-
-	        TransformerFactory tf = TransformerFactory.newInstance();
-	        Transformer trans = tf.newTransformer();
-	        trans.transform(new DOMSource(sigdoc), new StreamResult(os));
-	        System.out.println(trans);
+		        // Create a Reference to an external URI that will be digested
+		        // using the SHA1 digest algorithm
+		        //URI note file:///~/advancedXMLDigSig/ 
+		        List<XPathType> xpaths = new ArrayList<XPathType>();
+		        xpaths.add(new XPathType("/*", XPathType.Filter.INTERSECT));
+		        
+		        Reference ref = fac.newReference
+		  	          (this.targetURI, fac.newDigestMethod(DigestMethod.SHA1, null),
+		  	                Collections.singletonList
+		  	                  (fac.newTransform(Transform.XPATH2, 
+		  	                          new XPathFilter2ParameterSpec(xpaths))), null, null); 
+	
+		        List<Reference> ref2 = Collections.singletonList(fac.newReference
+		          (this.targetURI, fac.newDigestMethod(DigestMethod.SHA1, null),
+		                Collections.singletonList
+		                  (fac.newTransform(Transform.XPATH2, 
+		                          new XPathFilter2ParameterSpec(xpaths))), null, null)); 
+	
+		        /*<XPath Filter="intersect" xmlns="http://www.w3.org/2002/06/xmldsig-filter2">
+	      			//.
+	   			  </XPath>*/
+		        	        
+		        //Manifest with reference URI
+		        Manifest manifest = fac.newManifest(ref2, "manifest-1");
+		        
+		        // Create the SignedInfo
+		        SignedInfo si = fac.newSignedInfo(
+		            fac.newCanonicalizationMethod
+		                (CanonicalizationMethod.INCLUSIVE,
+		                 (C14NMethodParameterSpec) null),
+		            fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null),
+		            Collections.singletonList(ref));
+	
+		        //throws XMLSecurityException
+		      
+	
+		        // Create a KeyValue containing the RSA PublicKey that was generated
+		        KeyInfoFactory kif = fac.getKeyInfoFactory();
+		        KeyValue kv = kif.newKeyValue(pubKey);
+	
+		        // Create a KeyInfo and add the KeyValue to it
+		        KeyInfo ki = kif.newKeyInfo(Collections.singletonList(kv));
+	
+		        // Create the XMLSignature
+		        XMLSignature signature = fac.newXMLSignature(si, ki);
+	
+		        // Create the Document that will hold the resulting XMLSignature
+		        DocumentBuilderFactory sigdbf = DocumentBuilderFactory.newInstance();
+		        sigdbf.setNamespaceAware(true); // must be set
+		        Document sigdoc = sigdbf.newDocumentBuilder().newDocument();
+	
+		        // Create a DOMSignContext and set the signing Key 
+		        //and specify where the XMLSignature should be inserted
+		        // in the target document (new xml document)
+		        DOMSignContext signContext = new DOMSignContext(privKey, sigdoc);
+	
+		        // Marshal, generate (and sign) the detached XMLSignature. The DOM
+		        // Document will contain the XML Signature if this method returns
+		        // successfully.
+		        //FileInputStream fis = new FileInputStream(this.targetURI);
+		        //signContext.setURIDereferencer(new MyURIDereferencer(fis));
+		        signature.sign(signContext);
+		
+	
+		        /*// output the resulting document
+		        OutputStream os,os2;
+		        //os = new FileOutputStream("." + File.separator + "Signature");
+		        os2 = System.out;
+	
+		        TransformerFactory tf = TransformerFactory.newInstance();
+		        Transformer trans = tf.newTransformer();
+		        trans.setOutputProperty(OutputKeys.INDENT, "yes");
+		        trans.transform(new DOMSource(sigdoc), new StreamResult(os2));
+				*/
+			
+			return sigdoc;
 	    }
 
 	}
