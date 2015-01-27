@@ -28,7 +28,11 @@ public class ValidateSignature {
 		this.pubkfile = pub;
 		this.targetURI = tar;
 	}
-	
+	/**
+	 * 
+	 * @return true if the validation process ha success
+	 * @throws Exception
+	 */
 	public boolean Validate() throws Exception{
 	//Instantiate the document that contain the signature
 	//JAXP parser
@@ -62,7 +66,7 @@ public class ValidateSignature {
 			DOMValidateContext valContext = new DOMValidateContext(new KeyValueKeySelector(), nl.item(i));
 		}
 	}*/
-	//In this early version i'll set the public key manually 
+	//In this early version i'll choose the first signature 
 	DOMValidateContext valContext = new DOMValidateContext(this.pubkfile, nl.item(0)); 
 	
 	//XMLsignature object

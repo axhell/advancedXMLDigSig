@@ -1,6 +1,5 @@
 package xmlsigmodule;
 
-import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -56,7 +55,17 @@ public class ValidationModule {
 
 	}
 	
-	
+	/**
+	 * Sign Certification Model instance in input, after validate the signature of Certification Model template in input, 
+	 * and all key's certificate.
+	 * @param cmTsignature , URI signature of CM template
+	 * @param pubkCMt	, URI Public Key for Certification Model validation
+	 * @param cmIunsigned , URI CM instance unsigned
+	 * @param pubkFW	, URI Public Key of the framework used to sign CM instance
+	 * @param privkFW	, URI Private Key of the framework used to sign CM instance
+	 * @return
+	 * @throws Exception
+	 */
 	public static boolean RequestSignCMInstance(String cmTsignature, String pubkCMt, 
 												String cmIunsigned, String pubkFW, 
 												String privkFW) throws Exception{
@@ -97,6 +106,7 @@ public class ValidationModule {
 			
 		}else{
 			sigprocess = false;
+			System.out.println("Validation of CM template failed");
 		}
 		
 		

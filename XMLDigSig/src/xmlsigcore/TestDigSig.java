@@ -4,10 +4,15 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import xmlsigcore.*;
 
-
+/**
+ * this class is used for test purposes only
+ * @author axhell
+ *
+ */
 public class TestDigSig {
 
 	/**
+	 * 
 	 * @param args
 	 * @throws Exception 
 	 */
