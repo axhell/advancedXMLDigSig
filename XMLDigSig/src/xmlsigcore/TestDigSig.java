@@ -2,6 +2,7 @@ package xmlsigcore;
 //import java.io.File;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import xmlsigcore.*;
 
 
 public class TestDigSig {
@@ -11,7 +12,7 @@ public class TestDigSig {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		// TODO Auto-generated method stub
+		// 
 		
 		PublicKey pubKey = null;
 		PrivateKey privKey = null;
@@ -21,7 +22,7 @@ public class TestDigSig {
 			pubKey = RSAPublicKeyReader.getPubKeyFormFile(args[1]);
 			privKey = RSAPrivateKeyReader.getPrivKeyFromFile(args[2]);
 			target = args[3];
-			GenDetachedBuilder inputs = new GenDetachedBuilder(pubKey, privKey, target);
+			GenDetached inputs = new GenDetached(pubKey, privKey, target);
 			inputs.GenerateSig();
 			
 		}else if (args.length == 3 && args[0].equalsIgnoreCase("-v")){
