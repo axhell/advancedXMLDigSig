@@ -28,7 +28,7 @@ public class ValidateSignature {
 		this.targetURI = tar;
 	}
 	
-	public void Validate() throws Exception{
+	public boolean Validate() throws Exception{
 	//Instantiate the document that contain the signature
 	//JAXP parser
 	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -72,6 +72,7 @@ public class ValidateSignature {
 	boolean coreValidity = signature.validate(valContext); 
 	
 	System.out.println("signature is: "+ coreValidity);
+	return coreValidity;
 	
 	}
 }
