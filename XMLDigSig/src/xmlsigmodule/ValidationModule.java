@@ -1,11 +1,23 @@
 package xmlsigmodule;
 
+import java.io.FileInputStream;
+import java.io.OutputStream;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+
 import xmlsigcore.*;
 
-public class InputValidationModule extends TestDigSig{
+public class ValidationModule {
 
 	
 /**
@@ -55,15 +67,38 @@ public class InputValidationModule extends TestDigSig{
 		final PublicKey pubKeyFW = RSAPublicKeyReader.getPubKeyFormFile(pubkFW);
 		String target = cmIunsigned;
 		
+		// Create the Document that will hold the resulting XMLSignature
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		//namespace-aware
+		dbf.setNamespaceAware(true);
+		//instance of the document builder		
+		DocumentBuilder builder = dbf.newDocumentBuilder();
+		//Parse the input file
+		Document sigdoc = null;
+		
 		//Validate signature of Certification Model template
-		ValidateSignature cmtemplate = new ValidateSignature(pubKeyCMt, target);
+		ValidateSignature cmtemplate = new ValidateSignature(pubKeyCMt, cmTsig);
 		
 		if(cmtemplate.Validate()){
-			sigprocess = true;
 			GenDetached cminstance = new GenDetached(pubKeyFW, privKFW, target);
+			sigdoc = cminstance.GenerateSig();
+			if (sigdoc != null){
+				sigprocess = true;
+				
+				 OutputStream os;
+			     os = System.out;
+			     TransformerFactory tf = TransformerFactory.newInstance();
+			     Transformer trans = tf.newTransformer();
+			     trans.setOutputProperty(OutputKeys.INDENT, "yes");
+			     trans.transform(new DOMSource(sigdoc), new StreamResult(os));
+					
+				
+			}
+			
 		}else{
 			sigprocess = false;
 		}
+		
 		
 		
 		return sigprocess;
