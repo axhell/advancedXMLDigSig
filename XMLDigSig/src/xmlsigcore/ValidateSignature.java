@@ -20,7 +20,7 @@ public class ValidateSignature {
 	private String targetURI;
 	
 	/**
-	 * This builder is a input collector used to generate a detached signature
+	 * input collector used to validate signature
 	 * @param pub , public key file
 	 * @param tar , target file to be signed
 	 */
