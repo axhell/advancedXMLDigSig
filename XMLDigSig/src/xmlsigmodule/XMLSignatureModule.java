@@ -16,7 +16,7 @@ import org.w3c.dom.Document;
 
 import xmlsigcore.*;
 
-public class ValidationModule {
+public class XMLSignatureModule {
 
 	
 /**
@@ -114,6 +114,45 @@ public class ValidationModule {
 		return sigprocess;
 		
 	}
+	/**
+	 * create an untrusted signature for test purposes
+	 * @param targetURI
+	 * @param pubkFW
+	 * @param privkFW
+	 * @return
+	 * @throws Exception
+	 */
+	public static boolean FakeSignature(String targetURI, String pubkFW, String privkFW) throws Exception{
+	
+		boolean sigprocess = false;
+		
+		final PrivateKey privKFW = RSAPrivateKeyReader.getPrivKeyFromFile(privkFW);
+		final PublicKey pubKeyFW = RSAPublicKeyReader.getPubKeyFormFile(pubkFW);
+		String target = targetURI;
+		
+		// Create the Document that will hold the resulting XMLSignature
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		//namespace-aware
+		dbf.setNamespaceAware(true);
+		//instance of the document builder		
+		//DocumentBuilder builder = dbf.newDocumentBuilder();
+		//Parse the input file
+		Document sigdoc = null;
+		
+		GenDetached cminstance = new GenDetached(pubKeyFW, privKFW, target);
+		sigdoc = cminstance.GenerateSig();
+		sigprocess = true;
+		
+		OutputStream os;
+		os = System.out;
+		TransformerFactory tf = TransformerFactory.newInstance();
+		Transformer trans = tf.newTransformer();
+		trans.setOutputProperty(OutputKeys.INDENT, "yes");
+		trans.transform(new DOMSource(sigdoc), new StreamResult(os));
 
 
+
+		return sigprocess;
+
+	}
 }
