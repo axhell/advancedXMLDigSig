@@ -28,7 +28,7 @@ import org.w3c.dom.Document;
 	 * This class generate a Detached XMLSignature using the JSR 105 API.
 	 *
 	 */
-	public class GenDetachedBuilder {
+	public class GenDetached {
 		private PublicKey pubkfile;
 		private PrivateKey privkfile;
 		private String targetURI;
@@ -39,7 +39,7 @@ import org.w3c.dom.Document;
 		 * @param priv , private key file
 		 * @param tar , target file to be signed
 		 */
-		public GenDetachedBuilder(PublicKey pub, PrivateKey priv, String tar){
+		public GenDetached(PublicKey pub, PrivateKey priv, String tar){
 			this.pubkfile = pub;
 			this.privkfile = priv;
 			this.targetURI = tar;
@@ -69,16 +69,6 @@ import org.w3c.dom.Document;
 			//final KeyPair kp = new KeyPair(cert.getPublicKey(), key.getPrivateKey());
 			
 			
-			/*//JAXP parser
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			//namespace-aware
-			dbf.setNamespaceAware(true);
-			
-			DocumentBuilder builder = dbf.newDocumentBuilder();
-			
-			//Parse the input file
-			Document doc = builder.parse(target);*/ 
-			//Create signature context
 
 	        // DOM XMLSignatureFactory that will be used to
 	        // generate the XMLSignature and marshal it to DOM.
@@ -156,6 +146,7 @@ import org.w3c.dom.Document;
 	        TransformerFactory tf = TransformerFactory.newInstance();
 	        Transformer trans = tf.newTransformer();
 	        trans.transform(new DOMSource(sigdoc), new StreamResult(os));
+	        System.out.println(trans);
 	    }
 
 	}
