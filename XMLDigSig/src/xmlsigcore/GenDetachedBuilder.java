@@ -9,6 +9,7 @@ import javax.xml.crypto.dsig.spec.XPathFilter2ParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathType;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
@@ -142,7 +143,8 @@ import org.w3c.dom.Document;
 	        // Marshal, generate (and sign) the detached XMLSignature. The DOM
 	        // Document will contain the XML Signature if this method returns
 	        // successfully.
-	        //signContext.setURIDereferencer(new MyURIDereferencer(ref));
+	        //FileInputStream fis = new FileInputStream(this.targetURI);
+	        //signContext.setURIDereferencer(new MyURIDereferencer(fis));
 	        signature.sign(signContext);
 
 	        // output the resulting document
