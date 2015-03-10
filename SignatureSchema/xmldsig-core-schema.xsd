@@ -230,6 +230,7 @@
 
 <!-- Start Object (Manifest, SignatureProperty) -->
 
+
 <element name="Object" type="ds:ObjectType"/> 
 <complexType name="ObjectType" mixed="true">
   <sequence minOccurs="0" maxOccurs="unbounded">
