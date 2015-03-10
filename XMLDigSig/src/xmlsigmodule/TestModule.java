@@ -10,11 +10,21 @@ public class TestModule {
 	public static void main(String[] args) throws Exception {
 		//
 		
-		if (args.length<3||args.length>3){System.out.println("usage: TestSigModule <targetURI><PubK><PrivK>");
-		}else{
-			XMLSignatureModule.FakeSignature(args[0], args[1], args[2]);
+		if (args.length != 1){ PrintUsage();
+		}else if(args[0].equalsIgnoreCase("-CMinsSign")){
+			XMLSignatureGenModule.GenCMinstSignature();
+		}else if(args[0].equalsIgnoreCase("-CMinsVerify")){
+			XMLSignatureVerifyModule.VerifyCMinsSignature();
 		}
 
+	}
+	private static void PrintUsage() {
+		// TODO Auto-generated method stub
+		
+		System.out.println("usage: TestDigSig [COMMAND]");
+		System.out.println("option: ");
+		System.out.println("-CMinsSign : generate signature for Certification Model instace");
+		System.out.println("-CMinsVerify : verify signature one Certification Model instace");
 	}
 
 }

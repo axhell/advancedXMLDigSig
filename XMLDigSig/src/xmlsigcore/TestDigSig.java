@@ -23,12 +23,10 @@ public class TestDigSig {
 		PrivateKey privKey = null;
 		String target = null;
 		
-		if (args.length == 4 && args[0].equalsIgnoreCase("-s")){
-			pubKey = RSAPublicKeyReader.getPubKeyFormFile(args[1]);
-			privKey = RSAPrivateKeyReader.getPrivKeyFromFile(args[2]);
-			target = args[3];
-			GenDetached inputs = new GenDetached(pubKey, privKey, target);
-			inputs.GenerateSig();
+		if (args.length == 1 && args[0].equalsIgnoreCase("-CMinsSign")){
+			
+			//GenDetached inputs = new GenDetached(pubKey, privKey, target);
+			//inputs.GenerateSig();
 			
 		}else if (args.length == 3 && args[0].equalsIgnoreCase("-v")){
 			pubKey = RSAPublicKeyReader.getPubKeyFormFile(args[1]);
@@ -46,10 +44,10 @@ public class TestDigSig {
 	private static void PrintUsage() {
 		// TODO Auto-generated method stub
 		
-		System.out.println("usage: TestDigSig [COMMAND] [INPUT]");
+		System.out.println("usage: TestDigSig [COMMAND]");
 		System.out.println("option: ");
-		System.out.println("-s <PublicKey file> <PrivarteKey file> <URI> : generate detached digital signature of the target URI");
-		System.out.println("-v <PublicKey file> <URI> : validate digital signature in the target URI");
+		System.out.println("-CMinsSign : generate signature for Certification Model instace");
+		System.out.println("-CMinstVerify : verify signature one Certification Model instace");
 	}
 
 }
