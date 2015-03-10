@@ -1,0 +1,244 @@
+$openssl genrsa -out ca_rsa_priveKey.key 2048
+Generating RSA private key, 2048 bit long modulus
+...............+++
+........+++
+e is 65537 (0x10001)
+
+
+
+$openssl genrsa -out my_rsa_priveKey.key 2048 
+Generating RSA private key, 2048 bit long modulus
+..+++
+..................................+++
+e is 65537 (0x10001)
+
+
+#mostra la parte pubblica
+$openssl rsa -in my_rsa_priveKey.key -pubout 
+writing RSA key
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Uo+deqfaxJSpZhAkC+8
+immQdFrhGNepOOabOVmFs0aoPgU+X4SS591zDGjtWV65lBY/bQcLX/wRtFLh5RX3
+KJmrkKso7DUMWxa9kOlM+RdhVsr7wcjAVrLTm/XSNCGIoknjazUnz+T5RGDXp9xq
+2dgU/jAHHksm9FWawOcYyXzBEW3QtapXaeouO18b8HjXF+WCZZZaAP5qkOxBB0GC
+jzeitVNamC7AJE/luVOUjil3J6SrQ1RNXgww2+Kk8L1ODGl//JuZrlQrHLjmVLvq
+ibCNS21+mTfaJoOz5qbup2EOdW/wBKhgIuAoXvGae3goTLgJhnGPO3A4KmPyk/uL
+NwIDAQAB
+-----END PUBLIC KEY-----
+
+
+
+#comando per trasformare la chiave privata in formato pkcs8 in codifica DER
+$openssl pkcs8 -topk8 -inform PEM -outform DER -in ca_rsa_priveKey.key  -nocrypt > ca_rsa_priveKey.der
+
+#comando ottenere la parte pubblica in formato PEM
+$openssl rsa -in ca_rsa_priveKey.key -pubout -out ca_rsa_pubKey.key
+writing RSA key
+#comando ottenere la parte pubblica in formato DER
+openssl rsa -in ca_rsa_priveKey.key -outform DER -out ca_rsa_pubKey.der
+writing RSA key
+
+
+
+#comando creazione selfsigned certificato
+$openssl req -x509 -days 365 -extensions v3_ca -in rootCA.csr -key ca_rsa_priveKey.key -out rootCA.crt
+giusto$openssl x509 -req -extensions v3_ca -in rootCA.csr  -days 365 -signkey ca_rsa_priveKey.key -out rootCA.crt
+
+---------------------certificato CA root----------------------------------
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 12445456468242660543 (0xacb724b81130fcbf)
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=IT, ST=RM, O=DemoRootCA, OU=Registration Authority/emailAddress=example at camail dot com
+        Validity
+            Not Before: Mar  5 15:28:58 2015 GMT
+            Not After : Mar  4 15:28:58 2016 GMT
+        Subject: C=IT, ST=RM, O=DemoRootCA, OU=Registration Authority/emailAddress=example at camail dot com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:ad:90:9c:06:5f:ba:f5:30:d6:b1:98:4c:08:ff:
+                    74:3e:ed:57:c8:cc:b7:4c:6e:c9:2a:24:96:2a:6f:
+                    0c:6f:4d:97:8c:76:c2:c8:f7:22:57:be:a7:b7:22:
+                    b5:c7:f8:23:9d:2a:d3:ca:1e:6c:bc:33:64:35:65:
+                    23:a7:76:23:37:d9:16:51:19:84:f0:86:fb:8b:d7:
+                    c9:0a:b4:b2:b6:f7:fa:bc:0e:af:ff:66:1b:3b:db:
+                    05:75:e2:b5:5f:9a:13:8f:f5:bd:c2:47:b3:ec:ad:
+                    dc:c5:e3:80:b6:c5:9f:93:b5:60:5d:96:0d:e8:75:
+                    92:e5:c7:29:85:01:8c:0e:f1:62:46:5f:af:e9:17:
+                    f8:89:da:26:b3:27:c0:3a:4a:a6:17:40:05:72:64:
+                    a9:11:a0:d1:8b:8d:c0:d4:9e:4d:64:58:ee:90:92:
+                    23:6a:a1:d6:29:cb:79:b1:7c:9e:13:ea:67:24:ac:
+                    42:b0:3d:05:06:56:71:77:35:27:6b:95:48:46:74:
+                    8f:15:c5:79:32:6b:4b:34:67:e4:7d:a3:bf:48:2c:
+                    9e:91:f8:a0:a0:62:ad:48:13:2c:12:8d:46:92:6f:
+                    f3:a5:36:39:84:b1:79:18:16:6f:c7:26:cb:87:ba:
+                    40:32:18:1c:0e:f0:02:eb:bc:5d:93:25:c0:29:65:
+                    32:bf
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Subject Key Identifier: 
+                BF:4F:F0:59:16:08:BB:9F:46:60:15:3F:6E:ED:4A:DE:77:24:FE:BD
+            X509v3 Authority Key Identifier: 
+                keyid:BF:4F:F0:59:16:08:BB:9F:46:60:15:3F:6E:ED:4A:DE:77:24:FE:BD
+
+            X509v3 Basic Constraints: 
+                CA:TRUE
+            X509v3 Key Usage: critical
+                Non Repudiation
+            X509v3 CRL Distribution Points: 
+
+                Full Name:
+                  URI:http://myhost.com/ca.crl
+
+            Authority Information Access: 
+                OCSP - URI:http://ocsp.my.host/
+
+    Signature Algorithm: sha256WithRSAEncryption
+         32:a0:5c:af:5d:dc:d4:0a:5e:41:ca:03:62:b2:3a:44:ce:a4:
+         9e:ed:91:07:eb:01:52:d3:81:fd:43:19:4a:06:e4:34:9b:55:
+         ae:95:ae:2d:1f:73:81:36:c6:33:1a:95:76:01:16:b7:c8:2e:
+         88:b8:fa:e1:bb:1d:32:cf:f6:e6:e8:e3:44:01:cf:6d:50:ef:
+         6e:82:7a:c5:74:a5:85:09:cb:95:bc:32:c5:cb:1a:ba:98:21:
+         a9:3a:2f:d8:9f:5f:e5:cb:63:1b:69:83:4f:b5:1a:8e:66:ff:
+         d0:04:48:b4:08:a2:03:01:4e:8b:67:c0:49:e9:53:ff:bf:37:
+         d5:ad:3f:19:69:9f:ef:05:15:dc:e5:47:b7:72:12:a0:55:1a:
+         33:18:04:44:16:3e:3e:e0:b9:d5:05:4d:e2:d4:ca:81:ea:9a:
+         4c:39:6a:4b:32:00:db:90:8e:bd:fb:c1:06:92:e6:3c:fc:e4:
+         31:bb:82:b1:e9:78:06:76:5c:87:52:dd:4b:d7:7b:8d:cf:46:
+         c6:bc:cc:3e:a7:dc:e7:e3:5b:e3:b4:78:a3:69:49:fa:a4:63:
+         2f:b9:10:9f:57:00:46:1d:0c:b9:a4:7c:be:f0:f8:62:74:25:
+         f7:ce:d1:9a:9e:cd:fa:98:ce:3e:2d:9d:7e:30:c4:2b:b6:34:
+         c3:a9:80:94
+-----BEGIN CERTIFICATE-----
+MIIENjCCAx6gAwIBAgIJAKy3JLgRMPy/MA0GCSqGSIb3DQEBCwUAMHoxCzAJBgNV
+BAYTAklUMQswCQYDVQQIDAJSTTETMBEGA1UECgwKRGVtb1Jvb3RDQTEfMB0GA1UE
+CwwWUmVnaXN0cmF0aW9uIEF1dGhvcml0eTEoMCYGCSqGSIb3DQEJARYZZXhhbXBs
+ZSBhdCBjYW1haWwgZG90IGNvbTAeFw0xNTAzMDUxNTI4NThaFw0xNjAzMDQxNTI4
+NThaMHoxCzAJBgNVBAYTAklUMQswCQYDVQQIDAJSTTETMBEGA1UECgwKRGVtb1Jv
+b3RDQTEfMB0GA1UECwwWUmVnaXN0cmF0aW9uIEF1dGhvcml0eTEoMCYGCSqGSIb3
+DQEJARYZZXhhbXBsZSBhdCBjYW1haWwgZG90IGNvbTCCASIwDQYJKoZIhvcNAQEB
+BQADggEPADCCAQoCggEBAK2QnAZfuvUw1rGYTAj/dD7tV8jMt0xuySoklipvDG9N
+l4x2wsj3Ile+p7citcf4I50q08oebLwzZDVlI6d2IzfZFlEZhPCG+4vXyQq0srb3
++rwOr/9mGzvbBXXitV+aE4/1vcJHs+yt3MXjgLbFn5O1YF2WDeh1kuXHKYUBjA7x
+YkZfr+kX+InaJrMnwDpKphdABXJkqRGg0YuNwNSeTWRY7pCSI2qh1inLebF8nhPq
+ZySsQrA9BQZWcXc1J2uVSEZ0jxXFeTJrSzRn5H2jv0gsnpH4oKBirUgTLBKNRpJv
+86U2OYSxeRgWb8cmy4e6QDIYHA7wAuu8XZMlwCllMr8CAwEAAaOBvjCBuzAdBgNV
+HQ4EFgQUv0/wWRYIu59GYBU/bu1K3nck/r0wHwYDVR0jBBgwFoAUv0/wWRYIu59G
+YBU/bu1K3nck/r0wDAYDVR0TBAUwAwEB/zAOBgNVHQ8BAf8EBAMCBkAwKQYDVR0f
+BCIwIDAeoBygGoYYaHR0cDovL215aG9zdC5jb20vY2EuY3JsMDAGCCsGAQUFBwEB
+BCQwIjAgBggrBgEFBQcwAYYUaHR0cDovL29jc3AubXkuaG9zdC8wDQYJKoZIhvcN
+AQELBQADggEBADKgXK9d3NQKXkHKA2KyOkTOpJ7tkQfrAVLTgf1DGUoG5DSbVa6V
+ri0fc4E2xjMalXYBFrfILoi4+uG7HTLP9ubo40QBz21Q726CesV0pYUJy5W8MsXL
+GrqYIak6L9ifX+XLYxtpg0+1Go5m/9AESLQIogMBTotnwEnpU/+/N9WtPxlpn+8F
+FdzlR7dyEqBVGjMYBEQWPj7gudUFTeLUyoHqmkw5aksyANuQjr37wQaS5jz85DG7
+grHpeAZ2XIdS3UvXe43PRsa8zD6n3OfjW+O0eKNpSfqkYy+5EJ9XAEYdDLmkfL7w
++GJ0JffO0ZqezfqYzj4tnX4wxCu2NMOpgJQ=
+-----END CERTIFICATE-----
+
+
+
+
+
+--------------------Certificato utente-------------------------------------------
+#comandi
+openssl x509 -req -days 100 -in userCert.csr -CA rootCA.crt -CAkey ca_rsa_priveKey.key -CAcreateserial -out userCertificate.crt -extfile /etc/ssl/openssl.cnf 
+Signature ok
+subject=/C=IT/ST=RM/L=Roma/O=Internet Widgits Pty Ltd/OU=Infosec/CN=Alessandro Bosco/emailAddress=alex at mail dot com
+Getting CA Private Key
+#certificato
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 10141844307537780249 (0x8cbf11a9f61b5e19)
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=IT, ST=RM, O=DemoRootCA, OU=Registration Authority/emailAddress=example at camail dot com
+        Validity
+            Not Before: Mar  5 15:59:00 2015 GMT
+            Not After : Jun 13 15:59:00 2015 GMT
+        Subject: C=IT, ST=RM, L=Roma, O=Internet Widgits Pty Ltd, OU=Infosec, CN=Alessandro Bosco/emailAddress=alex at mail dot com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:d1:4a:3e:75:ea:9f:6b:12:52:a5:98:40:90:2f:
+                    bc:8a:69:90:74:5a:e1:18:d7:a9:38:e6:9b:39:59:
+                    85:b3:46:a8:3e:05:3e:5f:84:92:e7:dd:73:0c:68:
+                    ed:59:5e:b9:94:16:3f:6d:07:0b:5f:fc:11:b4:52:
+                    e1:e5:15:f7:28:99:ab:90:ab:28:ec:35:0c:5b:16:
+                    bd:90:e9:4c:f9:17:61:56:ca:fb:c1:c8:c0:56:b2:
+                    d3:9b:f5:d2:34:21:88:a2:49:e3:6b:35:27:cf:e4:
+                    f9:44:60:d7:a7:dc:6a:d9:d8:14:fe:30:07:1e:4b:
+                    26:f4:55:9a:c0:e7:18:c9:7c:c1:11:6d:d0:b5:aa:
+                    57:69:ea:2e:3b:5f:1b:f0:78:d7:17:e5:82:65:96:
+                    5a:00:fe:6a:90:ec:41:07:41:82:8f:37:a2:b5:53:
+                    5a:98:2e:c0:24:4f:e5:b9:53:94:8e:29:77:27:a4:
+                    ab:43:54:4d:5e:0c:30:db:e2:a4:f0:bd:4e:0c:69:
+                    7f:fc:9b:99:ae:54:2b:1c:b8:e6:54:bb:ea:89:b0:
+                    8d:4b:6d:7e:99:37:da:26:83:b3:e6:a6:ee:a7:61:
+                    0e:75:6f:f0:04:a8:60:22:e0:28:5e:f1:9a:7b:78:
+                    28:4c:b8:09:86:71:8f:3b:70:38:2a:63:f2:93:fb:
+                    8b:37
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            X509v3 Key Usage: critical
+                Non Repudiation
+            X509v3 Subject Key Identifier: 
+                5E:05:99:C3:ED:78:18:4F:EC:0E:00:E7:B3:AF:F9:E8:61:90:C3:4B
+            X509v3 Authority Key Identifier: 
+                keyid:BF:4F:F0:59:16:08:BB:9F:46:60:15:3F:6E:ED:4A:DE:77:24:FE:BD
+
+            X509v3 CRL Distribution Points: 
+
+                Full Name:
+                  URI:http://myhost.com/ca.crl
+
+            Authority Information Access: 
+                OCSP - URI:http://ocsp.my.host/
+
+    Signature Algorithm: sha256WithRSAEncryption
+         86:68:cc:5a:49:17:aa:61:41:51:24:16:53:e2:ae:10:b8:3c:
+         4f:97:cb:69:9e:47:dd:6c:7c:d7:aa:b2:7b:6c:06:30:27:3d:
+         d3:53:c8:5c:c5:d8:b0:ba:41:a9:d5:ca:ad:18:56:75:98:d0:
+         df:8f:0a:15:aa:2f:34:31:00:62:b7:c9:66:fa:32:15:8a:d9:
+         db:04:d4:d9:9a:9c:96:4e:f0:c7:9c:fc:a4:cb:b3:b2:41:39:
+         3f:cf:2a:b8:3f:8b:bd:8e:f5:c0:57:61:1d:37:08:a4:16:63:
+         28:7b:f3:c8:43:f4:e8:04:19:06:27:97:86:e8:7c:4b:35:33:
+         a8:5e:e6:30:3c:28:17:bf:15:59:ef:95:3c:a8:26:dd:18:82:
+         81:2e:6c:e9:93:de:82:45:55:82:eb:77:c5:e5:5b:f2:f6:ed:
+         be:bc:34:13:dc:26:93:68:e0:2f:43:97:c5:01:bd:4c:f9:a5:
+         43:bc:8a:17:70:cb:65:05:28:7a:4d:68:cf:02:ae:d1:bf:9f:
+         08:f6:df:7e:ae:4d:d5:37:89:2a:f3:ce:a7:64:d7:8d:b1:c8:
+         e1:cd:88:a6:06:83:80:ce:e9:78:fa:eb:f2:cc:76:7a:af:90:
+         83:a0:d6:f6:50:6b:8c:ee:7a:7c:65:82:83:92:c3:11:99:5f:
+         64:75:4d:5a
+-----BEGIN CERTIFICATE-----
+MIIEWDCCA0CgAwIBAgIJAIy/Ean2G14ZMA0GCSqGSIb3DQEBCwUAMHoxCzAJBgNV
+BAYTAklUMQswCQYDVQQIDAJSTTETMBEGA1UECgwKRGVtb1Jvb3RDQTEfMB0GA1UE
+CwwWUmVnaXN0cmF0aW9uIEF1dGhvcml0eTEoMCYGCSqGSIb3DQEJARYZZXhhbXBs
+ZSBhdCBjYW1haWwgZG90IGNvbTAeFw0xNTAzMDUxNTU5MDBaFw0xNTA2MTMxNTU5
+MDBaMIGeMQswCQYDVQQGEwJJVDELMAkGA1UECAwCUk0xDTALBgNVBAcMBFJvbWEx
+ITAfBgNVBAoMGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDEQMA4GA1UECwwHSW5m
+b3NlYzEZMBcGA1UEAwwQQWxlc3NhbmRybyBCb3NjbzEjMCEGCSqGSIb3DQEJARYU
+YWxleCBhdCBtYWlsIGRvdCBjb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+AoIBAQDRSj516p9rElKlmECQL7yKaZB0WuEY16k45ps5WYWzRqg+BT5fhJLn3XMM
+aO1ZXrmUFj9tBwtf/BG0UuHlFfcomauQqyjsNQxbFr2Q6Uz5F2FWyvvByMBWstOb
+9dI0IYiiSeNrNSfP5PlEYNen3GrZ2BT+MAceSyb0VZrA5xjJfMERbdC1qldp6i47
+XxvweNcX5YJllloA/mqQ7EEHQYKPN6K1U1qYLsAkT+W5U5SOKXcnpKtDVE1eDDDb
+4qTwvU4MaX/8m5muVCscuOZUu+qJsI1LbX6ZN9omg7Pmpu6nYQ51b/AEqGAi4Che
+8Zp7eChMuAmGcY87cDgqY/KT+4s3AgMBAAGjgbswgbgwCQYDVR0TBAIwADAOBgNV
+HQ8BAf8EBAMCBkAwHQYDVR0OBBYEFF4FmcPteBhP7A4A57Ov+ehhkMNLMB8GA1Ud
+IwQYMBaAFL9P8FkWCLufRmAVP27tSt53JP69MCkGA1UdHwQiMCAwHqAcoBqGGGh0
+dHA6Ly9teWhvc3QuY29tL2NhLmNybDAwBggrBgEFBQcBAQQkMCIwIAYIKwYBBQUH
+MAGGFGh0dHA6Ly9vY3NwLm15Lmhvc3QvMA0GCSqGSIb3DQEBCwUAA4IBAQCGaMxa
+SReqYUFRJBZT4q4QuDxPl8tpnkfdbHzXqrJ7bAYwJz3TU8hcxdiwukGp1cqtGFZ1
+mNDfjwoVqi80MQBit8lm+jIVitnbBNTZmpyWTvDHnPyky7OyQTk/zyq4P4u9jvXA
+V2EdNwikFmMoe/PIQ/ToBBkGJ5eG6HxLNTOoXuYwPCgXvxVZ75U8qCbdGIKBLmzp
+k96CRVWC63fF5Vvy9u2+vDQT3CaTaOAvQ5fFAb1M+aVDvIoXcMtlBSh6TWjPAq7R
+v58I9t9+rk3VN4kq886nZNeNscjhzYimBoOAzul4+uvyzHZ6r5CDoNb2UGuM7np8
+ZYKDksMRmV9kdU1a
+-----END CERTIFICATE-----

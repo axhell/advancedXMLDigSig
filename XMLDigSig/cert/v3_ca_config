@@ -1,0 +1,5 @@
+basicConstraints=CA:TRUE
+keyUsage=critical, nonRepudiation
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer
+crlDistributionPoints=URI:http://myhost.com/myca.crl

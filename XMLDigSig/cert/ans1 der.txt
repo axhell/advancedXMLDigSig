@@ -1,0 +1,23 @@
+#comando per visualizzare il certificato in sinstassi asn1 in codifica der -- evidenziare la sinstassi ASN.1
+$openssl x509 -in rootCAexp.crt -outform der | openssl asn1parse -inform der
+  ....
+  650:d=4  hl=2 l=  31 cons:     SEQUENCE          
+  652:d=5  hl=2 l=   3 prim:      OBJECT            :X509v3 Authority Key Identifier
+  657:d=5  hl=2 l=  24 prim:      OCTET STRING      [HEX DUMP]:30168014BF4FF0591608BB9F4660153F6EED4ADE7724FEBD
+  683:d=4  hl=2 l=  14 cons:     SEQUENCE          
+  685:d=5  hl=2 l=   3 prim:      OBJECT            :X509v3 Key Usage
+  690:d=5  hl=2 l=   1 prim:      BOOLEAN           :255
+  693:d=5  hl=2 l=   4 prim:      OCTET STRING      [HEX DUMP]:03020640
+  ...
+  
+  
+$openssl x509 -in rootCAexp.crt -outform der | openssl asn1parse -inform der
+....
+SEQUENCE          
+ OBJECT            :X509v3 Authority Key Identifier
+ OCTET STRING      [HEX DUMP]:30168014BF4FF0591608BB9F4660153F6EED4ADE7724FEBD
+SEQUENCE          
+ OBJECT            :X509v3 Key Usage
+ BOOLEAN           :255
+ OCTET STRING      [HEX DUMP]:03020640
+...
