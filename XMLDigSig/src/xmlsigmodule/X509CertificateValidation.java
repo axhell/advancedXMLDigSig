@@ -42,7 +42,7 @@ public class X509CertificateValidation {
 		this.Verify(ca);
 		this.ValidateCryptoConstraints();
 		this.checkValidity();
-		System.out.println("validate report: ");
+		System.out.println("--Certificate Validation Report-- ");
 		for(int i = 0; i<this.report.length;i++){
 			if(report[i]!= null)System.out.println(this.report[i]);
 		}
@@ -72,7 +72,7 @@ public class X509CertificateValidation {
 		this.Verify(ca);
 		this.ValidateCryptoConstraints();
 		this.checkValidity();
-		System.out.println("Validation Report: ");
+		System.out.println("--Certificate Validation Report-- ");
 		for(int i = 0; i<this.report.length;i++){
 			if(report[i]!= null)System.out.println(this.report[i]);
 		}

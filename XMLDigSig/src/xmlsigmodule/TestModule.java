@@ -12,7 +12,7 @@ public class TestModule {
 		
 		if (args.length != 1){ PrintUsage();
 		}else if(args[0].equalsIgnoreCase("-CMinsSign")){
-			XMLSignatureGenModule.GenCMinstSignature();
+			CMInstanceSignatureGenModule.GenCMinstSignature();
 		}else if(args[0].equalsIgnoreCase("-CMinsVerify")){
 			XMLSignatureVerifyModule.VerifyCMinsSignature();
 		}

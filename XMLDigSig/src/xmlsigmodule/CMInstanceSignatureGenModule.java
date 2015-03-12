@@ -6,6 +6,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 import javax.security.cert.CertificateEncodingException;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
@@ -16,21 +17,28 @@ import javax.xml.transform.stream.StreamResult;
 
 
 
+
+
+
+
 //import org.apache.xml.security.stax.ext.Transformer;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import xades4j.XAdES4jException;
 import xades4j.algorithms.XPath2FilterTransform.XPath2Filter;
 import xades4j.production.*;
+import xades4j.properties.AllDataObjsCommitmentTypeProperty;
 import xades4j.properties.DataObjectDesc;
 import xades4j.properties.DataObjectFormatProperty;
 import xades4j.providers.KeyingDataProvider;
 import xades4j.providers.impl.*;
 import xades4j.utils.XadesProfileResolutionException;
+import xades4j.xml.bind.xmldsig.XmlCanonicalizationMethodType;
 import xmlsigcore.RSAPrivateKeyReader;
 
 
-public class XMLSignatureGenModule {
+public class CMInstanceSignatureGenModule {
 	public static void GenCMinstSignature() throws IOException, CertificateEncodingException{
 		
 		X509CertificateValidation certCA = null;
@@ -39,6 +47,9 @@ public class XMLSignatureGenModule {
 		InputStream inStream = null;
 		String certCAfile = null;
 		String certUserfile = null;
+		String cmtemppath = null;
+		String cminstpath = null;
+
 		
 		
 		//Definition of the Trust anchors, root CA certificate with pub key.
@@ -76,26 +87,36 @@ public class XMLSignatureGenModule {
 		}
 		certUser = new X509CertificateValidation(inStream);
 		
-		PrivateKey privKCA = null;
+		PrivateKey privKuser = null;
 		try {
-			privKCA = RSAPrivateKeyReader.getPrivKeyFromFile("cert/ca_rsa_priveKey.der");
+			privKuser = RSAPrivateKeyReader.getPrivKeyFromFile("cert/my_rsa_priveKey.der");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		
 		
-		XadesSigner signer = getSigner(certCA.cert, privKCA);
 		
-		String cmtpath = "file://C:/Users/axhell/Documents/Github/XMLDigitalSignature/XMLDigSig/CMtemp.xml";
-		//cmtpath = URLEncoder.encode(cmtpath, "UTF-8"); 
-		signXAdESBES(cmtpath, signer);
+		System.out.println("CM Template absolute path (URI): ");
+		br = new BufferedReader(new InputStreamReader(System.in));
+		try {
+			cmtemppath = br.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+		System.out.println("CM Instance absolute path (URI): ");
+		br = new BufferedReader(new InputStreamReader(System.in));
+		try {
+			cminstpath = br.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		
 		//CM template verifica
-		//System.out.println("Certification Model Template (URI): ");
-		//Altri input?
-		//System.out.println("Optional input(blank to skip): ");
+		
 		
 		
 		
@@ -106,68 +127,18 @@ public class XMLSignatureGenModule {
 		certUser.Validate(certCA.cert);
 		
 		
-		//genara firma
+		
 		//Reference //CM insta, CM template, optional
-		//Canonicali
-		
-		//Firma
+		XadesSigner signer = getSigner(certUser.cert, privKuser);
+		//file://C:/Users/axhell/Documents/Github/XMLDigitalSignature/XMLDigSig/CMtemp.xml";
+		//genara firma
+		GenXAdESSignature newSig = new GenXAdESSignature(cminstpath, cmtemppath);
+		//Sign 
+		newSig.signCMiXAdESBES(signer);
 		
 	}
 
-	private static void signXAdESBES(String string, XadesSigner signer) {
-		
-		DataObjectDesc cmtemp = new DataObjectReference(string)
-		.withTransform(XPath2Filter.intersect("/"))
-		.withDataObjectFormat(new DataObjectFormatProperty("application/xml"))//MimeTipe qualify
-		;//timestamp qualify
-		SignedDataObjects objs = new SignedDataObjects(cmtemp);
-		
-		// Create the Document that will hold the resulting XMLSignature
-        DocumentBuilderFactory sigdbf = DocumentBuilderFactory.newInstance();
-        sigdbf.setNamespaceAware(true); // must be set
-        Document sigdoc = null;
-        try {
-			sigdoc = sigdbf.newDocumentBuilder().newDocument();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-        
-        try {
-			XadesSignatureResult result = signer.sign(objs, sigdoc);
-		} catch (XAdES4jException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
-        
-        // output the resulting document
-        OutputStream os2 = null;
-        try {
-			os2 = new FileOutputStream("CMTSignature");
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-        //os2 = System.out;
-
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer trans = null;
-		try {
-			trans = tf.newTransformer();
-		} catch (TransformerConfigurationException e) {
-			e.printStackTrace();
-		}
-        trans.setOutputProperty(OutputKeys.INDENT, "yes");
-        try {
-			trans.transform(new DOMSource(sigdoc), new StreamResult(os2));
-		} catch (TransformerException e) {
-			e.printStackTrace();
-		}
-        
-        
-	}
+	
 
 	private static XadesSigner getSigner(X509Certificate cert,
 			PrivateKey privKCA) {
@@ -182,4 +153,27 @@ public class XMLSignatureGenModule {
 		
 		
 	}
+	
+	/**
+     * Load a Document from an XML file
+     * @param path The path to the file
+     * @return The document extracted from the file
+     */
+    private static Document getDocument(String path) {
+        try {
+            // Load the XML to append the signature to.
+            File fXmlFile = new File(path);
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(fXmlFile);
+            doc.getDocumentElement().normalize();
+            return doc;
+        } catch (SAXException ex) {
+            return null;
+        } catch (IOException ex) {
+            return null;
+        } catch (ParserConfigurationException ex) {
+            return null;
+        }
+    }
 }
