@@ -1,20 +1,20 @@
 package xmlsigmodule;
 
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.Principal;
 import java.security.PublicKey;
 import java.security.SignatureException;
+import java.security.cert.CertificateFactory;
 import java.util.Date;
 
-import javax.security.cert.CertificateEncodingException;
-import javax.security.cert.CertificateException;
-import javax.security.cert.CertificateExpiredException;
-import javax.security.cert.CertificateNotYetValidException;
-import javax.security.cert.X509Certificate;
+
+
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
 
 public class X509CertificateValidation {
 	X509Certificate cert;
@@ -23,12 +23,17 @@ public class X509CertificateValidation {
 	private String[] report;
 	
 	X509CertificateValidation(InputStream inStream){
+		CertificateFactory cf = null;
 		try {
-			this.cert = X509Certificate.getInstance(inStream);
-		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		};
+			cf = CertificateFactory.getInstance("X.509");
+		} catch (CertificateException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			this.cert = (X509Certificate)cf.generateCertificate(inStream);
+		} catch (CertificateException e1) {
+			e1.printStackTrace();
+		}
 		
 		this.report = new String[10];
 	}
@@ -44,7 +49,6 @@ public class X509CertificateValidation {
 	}
 	
 	private boolean checkValidity() {
-		// TODO Auto-generated method stub
 		boolean isValid = false;
 		Date date = new Date();
 		
@@ -123,3 +127,4 @@ public class X509CertificateValidation {
 	}
 
 }
+
