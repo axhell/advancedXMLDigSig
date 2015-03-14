@@ -3,6 +3,8 @@ package xmlsigmodule;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,23 +29,23 @@ import xades4j.properties.DataObjectDesc;
 import xades4j.properties.DataObjectFormatProperty;
 
 public class GenXAdESSignature {
-    String cminstance;
-    String cmtemplate;
+    String firstRef;
+    String secondRef;
 	public GenXAdESSignature(String cminstancepath, String cmtpath) {
-		this.cminstance = cminstancepath;
-		this.cmtemplate = cmtpath;
+		this.firstRef = cminstancepath;
+		this.secondRef = cmtpath;
 	}
 
 	public void signCMiXAdESBES(XadesSigner signer) {
 		/**
 		 * Add the object reference to the signature
 		 */
-		DataObjectDesc cminst = new DataObjectReference(this.cminstance)
+		DataObjectDesc cminst = new DataObjectReference(this.firstRef)
 		.withTransform(XPath2Filter.intersect("/"))
 		.withDataObjectFormat(new DataObjectFormatProperty("application/xml"))//MimeTipe qualify
 		;
 	
-		DataObjectDesc cmtemp = new DataObjectReference(this.cmtemplate)
+		DataObjectDesc cmtemp = new DataObjectReference(this.secondRef)
 		.withTransform(XPath2Filter.intersect("/"))
 		.withDataObjectFormat(new DataObjectFormatProperty("application/xml"))//MimeTipe qualify
 		;
@@ -52,8 +54,8 @@ public class GenXAdESSignature {
 		
 		
 		SignedDataObjects alldata = new SignedDataObjects()
-				.withSignedDataObject(cminst).withBaseUri(this.cminstance)
-				.withSignedDataObject(cmtemp).withBaseUri(this.cmtemplate)
+				.withSignedDataObject(cminst).withBaseUri(this.firstRef)
+				.withSignedDataObject(cmtemp).withBaseUri(this.secondRef)
 				;
 		/**
 		* Commitment types defined in ETSI TS 101 903 V1.4.1 (2009-06).
@@ -91,7 +93,7 @@ public class GenXAdESSignature {
         // output the resulting document
         OutputStream os2 = null;
         try {
-			os2 = new FileOutputStream("CMInstance.xml");
+			os2 = new FileOutputStream("CMISignature.xml");
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -115,5 +117,74 @@ public class GenXAdESSignature {
         
 		
 	}
+	
+	
+	
+	public void signCMtempXAdESBES(XadesSigner signer) {
+		/**
+		 * Add the object reference to the signature
+		 */
+		DataObjectDesc cmtemp = new DataObjectReference(this.firstRef)
+		.withTransform(XPath2Filter.union("/*"))
+		.withDataObjectFormat(new DataObjectFormatProperty("application/xml"))//MimeTipe qualify
+		
+		;
+		
+		SignedDataObjects alldata = new SignedDataObjects()
+				.withSignedDataObject(cmtemp)
+				;
+		/**
+		* Commitment types defined in ETSI TS 101 903 V1.4.1 (2009-06).
+		* section 7.2.6.
+		*/
+		alldata.withCommitmentType(AllDataObjsCommitmentTypeProperty.proofOfOrigin());
+		
+		
+		// Create the Document that will hold the resulting XMLSignature
+        DocumentBuilderFactory sigdbf = DocumentBuilderFactory.newInstance();
+        sigdbf.setNamespaceAware(true);
+        Document sigdoc = null;
+        try {
+			sigdoc = sigdbf.newDocumentBuilder().newDocument();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+		
+        XadesSignatureResult result = null;
+        try {
+			result = signer.sign(alldata, sigdoc);
+		} catch (XAdES4jException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        XAdESSignatureVerifier sv = new XAdESSignatureVerifier(result);
+        sv.SigValidationForm();
+        
+        // output the resulting document
+        OutputStream os2 = null;
+        try {
+			os2 = new FileOutputStream("CMTSignature.xml");
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        //os2 = System.out;
 
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer trans = null;
+		try {
+			trans = tf.newTransformer();
+		} catch (TransformerConfigurationException e) {
+			e.printStackTrace();
+		}
+        trans.setOutputProperty(OutputKeys.INDENT, "yes");
+        try {
+			trans.transform(new DOMSource(sigdoc), new StreamResult(os2));
+		} catch (TransformerException e) {
+			e.printStackTrace();
+		}
+        
+     
+	}
 }

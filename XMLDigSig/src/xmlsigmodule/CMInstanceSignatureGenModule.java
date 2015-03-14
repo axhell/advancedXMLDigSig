@@ -6,6 +6,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 import javax.security.cert.CertificateEncodingException;
+import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,8 +22,14 @@ import javax.xml.transform.stream.StreamResult;
 
 
 
+
+
+
+
+
 //import org.apache.xml.security.stax.ext.Transformer;
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import xades4j.XAdES4jException;
@@ -31,15 +38,17 @@ import xades4j.production.*;
 import xades4j.properties.AllDataObjsCommitmentTypeProperty;
 import xades4j.properties.DataObjectDesc;
 import xades4j.properties.DataObjectFormatProperty;
+import xades4j.providers.CertificateValidationProvider;
 import xades4j.providers.KeyingDataProvider;
 import xades4j.providers.impl.*;
 import xades4j.utils.XadesProfileResolutionException;
+import xades4j.verification.XadesVerificationProfile;
 import xades4j.xml.bind.xmldsig.XmlCanonicalizationMethodType;
 import xmlsigcore.RSAPrivateKeyReader;
 
 
 public class CMInstanceSignatureGenModule {
-	public static void GenCMinstSignature() throws IOException, CertificateEncodingException{
+	public static void GenCMinstSignature() throws IOException, CertificateEncodingException, ParserConfigurationException{
 		
 		X509CertificateValidation certCA = null;
 		X509CertificateValidation certUser = null;
@@ -49,6 +58,7 @@ public class CMInstanceSignatureGenModule {
 		String certUserfile = null;
 		String cmtemppath = null;
 		String cminstpath = null;
+		String cmtsignature = null;
 
 		
 		
@@ -89,7 +99,7 @@ public class CMInstanceSignatureGenModule {
 		
 		PrivateKey privKuser = null;
 		try {
-			privKuser = RSAPrivateKeyReader.getPrivKeyFromFile("cert/my_rsa_priveKey.der");
+			privKuser = RSAPrivateKeyReader.getPrivKeyFromFile("cert/ca_rsa_priveKey.der");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -105,7 +115,23 @@ public class CMInstanceSignatureGenModule {
 			e.printStackTrace();
 		}
 		
-		
+		System.out.println("CM Template Signature relative path (URI): ");
+		br = new BufferedReader(new InputStreamReader(System.in));
+		try {
+			cmtsignature = br.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);		
+		DocumentBuilder builder = dbf.newDocumentBuilder();
+		Document signature = null;
+		try {
+			signature = builder.parse(new FileInputStream(cmtsignature));
+		} catch (SAXException e1) {
+			e1.printStackTrace();
+		}
+	
 		System.out.println("CM Instance absolute path (URI): ");
 		br = new BufferedReader(new InputStreamReader(System.in));
 		try {
@@ -122,22 +148,54 @@ public class CMInstanceSignatureGenModule {
 		
 		inStream.close();
 		
-		
+		System.out.println("Trust Anchor certificate validation:");
 		certCA.ValidateRootCA(certCA.cert);
+		System.out.println();
+		System.out.println("User certificate validation:");
 		certUser.Validate(certCA.cert);
 		
 		
-		
-		//Reference //CM insta, CM template, optional
-		XadesSigner signer = getSigner(certUser.cert, privKuser);
+		/*
+		//create CM template signature for test only
+		XadesSigner signerCMT = getSigner(certCA.cert, privKuser);
 		//file://C:/Users/axhell/Documents/Github/XMLDigitalSignature/XMLDigSig/CMtemp.xml";
 		//genara firma
-		GenXAdESSignature newSig = new GenXAdESSignature(cminstpath, cmtemppath);
+		GenXAdESSignature newSig = new GenXAdESSignature(cmtemppath , null);
 		//Sign 
-		newSig.signCMiXAdESBES(signer);
+		newSig.signCMtempXAdESBES(signerCMT);
+		*/
+		
+		System.out.println();
+		try {
+			XMLSignatureVerifyModule vv = new XMLSignatureVerifyModule(signature, cmtemppath);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+		/**
+		 * Create a signer for the Certification Model Instance
+		 */
+		//XadesSigner signerCMI = getSigner(certUser.cert, privKuser);
+		/**
+		 * Generate the signature content
+		 */
+		//GenXAdESSignature newSigI = new GenXAdESSignature(cminstpath , cmtemppath);
+		/**
+		 * Sign
+		 */
+		//newSigI.signCMtempXAdESBES(signerCMI);
+		
+		
 		
 	}
 
+	
+	       
+	
 	
 
 	private static XadesSigner getSigner(X509Certificate cert,
@@ -166,7 +224,7 @@ public class CMInstanceSignatureGenModule {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
-            doc.getDocumentElement().normalize();
+     
             return doc;
         } catch (SAXException ex) {
             return null;
