@@ -38,6 +38,11 @@ public class X509CertificateValidation {
 		this.report = new String[10];
 	}
 	
+	public X509CertificateValidation(X509Certificate cert) {
+		this.cert = cert;
+		this.report = new String[10];
+	}
+
 	public void ValidateRootCA(X509Certificate ca){
 		this.Verify(ca);
 		this.ValidateCryptoConstraints();

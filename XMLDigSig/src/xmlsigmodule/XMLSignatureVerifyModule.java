@@ -16,6 +16,10 @@ import java.security.cert.CertificateException;
 
 
 
+
+import java.security.cert.X509CertSelector;
+import java.security.cert.X509Certificate;
+
 import javax.xml.crypto.dsig.XMLSignature;
 
 
@@ -23,6 +27,9 @@ import javax.xml.crypto.dsig.XMLSignature;
 
 
 
+
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
 
 import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
@@ -56,13 +63,22 @@ public class XMLSignatureVerifyModule {
 		
 		
 		this.signature = (Element)signature.getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE).item(0);
-
+		
+		//KeyInfo ki;
+		//ki.this.signature.getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_KEYINFO);
+		//X509Data xdata = new X509Data();
+		//X509CertSelector certSelector = new X509CertSelector();
+		//certSelector = 
+		
+		
 		XadesVerificationProfile p = buildVerProfile();
-		//this.cv = certCA;
-		//this.sv = null;
 		XadesVerifier v = p.newVerifier();
 		SignatureSpecificVerificationOptions options = new SignatureSpecificVerificationOptions().useBaseUri(this.baseuri);
 		XAdESVerificationResult r = v.verify(this.signature, options);
+		
+		System.out.println("Verify the signer's certificate: ");
+		X509CertificateValidation xv = new X509CertificateValidation(r.getValidationCertificate());
+		xv.Validate(xv.cert);
 		
 		System.out.println(r.getSignatureForm());
 		System.out.println(r.getSignatureAlgorithmUri());
@@ -119,7 +135,8 @@ public class XMLSignatureVerifyModule {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		//certStore.getStore().getCertificates().
+		//trustAnchors.getCertificate("rootCA");
 		XadesVerificationProfile p = new XadesVerificationProfile(certValidator);
 		 return p;
 	}

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Partitions>
+	<Section id="1">
+	<XPath Filter="union"
+   xmlns="http://www.w3.org/2002/06/xmldsig-filter2"
+   xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+      \element1\
+		</XPath>
+		<XPath Filter="subtract"
+   xmlns="http://www.w3.org/2002/06/xmldsig-filter2"
+   xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+      \element1\ref\@URI
+		</XPath>
+	</Section>
+		<Section id="2">
+	<XPath Filter="union"
+   xmlns="http://www.w3.org/2002/06/xmldsig-filter2"
+   xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+      \element1\ref\@URI
+		</XPath>		
+	</Section>
+		<Section id="3">
+		<XPath Filter="subtract"
+   xmlns="http://www.w3.org/2002/06/xmldsig-filter2"
+   xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+      here()/ancestor::dsig:Signature[1]
+		</XPath>		
+	</Section>
+</Partitions>
