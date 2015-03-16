@@ -11,38 +11,14 @@ import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 
 
-
-
-
-
-
-
-import java.security.cert.X509CertSelector;
-import java.security.cert.X509Certificate;
-
-import javax.xml.crypto.dsig.XMLSignature;
-
-
-
-
-
-
-
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
-import javax.xml.crypto.dsig.keyinfo.X509Data;
-
 import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
-import xades4j.production.XadesFormatExtenderProfile;
-import xades4j.production.XadesSignatureFormatExtender;
 import xades4j.providers.CertificateValidationProvider;
 import xades4j.providers.impl.PKIXCertificateValidationProvider;
 import xades4j.utils.FileSystemDirectoryCertStore;
 import xades4j.verification.SignatureSpecificVerificationOptions;
-import xades4j.verification.XAdESForm;
 import xades4j.verification.XAdESVerificationResult;
 import xades4j.verification.XadesVerificationProfile;
 import xades4j.verification.XadesVerifier;
