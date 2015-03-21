@@ -37,21 +37,12 @@ import javax.xml.transform.stream.StreamResult;
 
 //import org.apache.xml.security.stax.ext.Transformer;
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import xades4j.XAdES4jException;
-import xades4j.algorithms.XPath2FilterTransform.XPath2Filter;
 import xades4j.production.*;
-import xades4j.properties.AllDataObjsCommitmentTypeProperty;
-import xades4j.properties.DataObjectDesc;
-import xades4j.properties.DataObjectFormatProperty;
-import xades4j.providers.CertificateValidationProvider;
 import xades4j.providers.KeyingDataProvider;
 import xades4j.providers.impl.*;
 import xades4j.utils.XadesProfileResolutionException;
-import xades4j.verification.XadesVerificationProfile;
-import xades4j.xml.bind.xmldsig.XmlCanonicalizationMethodType;
 import xmlsigcore.RSAPrivateKeyReader;
 
 
