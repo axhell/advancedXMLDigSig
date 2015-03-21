@@ -27,6 +27,14 @@ import javax.xml.parsers.ParserConfigurationException;
 
 
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 //import org.apache.xml.security.stax.ext.Transformer;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -159,14 +167,15 @@ public class CMInstanceSignatureGenModule {
 		certUser.Validate(certCA.cert);
 		
 		
-		
+		System.out.println("Certification Model Template signature validation: ");
 		//create CM template signature for test only
 		XadesSigner signerCMT = getSigner(certCA.cert, privKCA);
 		//file:/C:/Users/axhell/Documents/Github/XMLDigitalSignature/XMLDigSig/CMtemp.xml";
 		//genara firma
 		GenXAdESSignature newSig = new GenXAdESSignature(cmtempfn , null, PATH);
-		//Sign 
+		//Sign
 		newSig.signCMtempXAdESBES(signerCMT);
+		//writeSignedDocumentToFile(newSig.signCMtempXAdESBES(signerCMT));
 		
 		//GenEnvXAdESSignature newEnveloped = new GenEnvXAdESSignature(cmtempfn);
 		//newEnveloped.signCMtempXAdESBES(signerCMT);
@@ -191,7 +200,7 @@ public class CMInstanceSignatureGenModule {
 		/**
 		 * Sign
 		 */
-		//newSigI.signCMtempXAdESBES(signerCMI);
+		//writeSignedDocumentToFile(newSigI.signCMtempXAdESBES(signerCMI));
 		
 		
 		
@@ -233,9 +242,31 @@ public class CMInstanceSignatureGenModule {
 		DocumentBuilder builder = dbf.newDocumentBuilder();
 		signature = builder.parse(new FileInputStream(filename));
 		
-		
-		
-    
 		return signature;
+    }
+    //BUG
+    private static void writeSignedDocumentToFile(Document sigdoc) {
+		OutputStream os2 = null;
+        try {
+			os2 = new FileOutputStream("CMISignature.xml");
+		} catch (FileNotFoundException e1) {
+		
+			e1.printStackTrace();
+		}
+
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer trans = null;
+		try {
+			trans = tf.newTransformer();
+		} catch (TransformerConfigurationException e) {
+			e.printStackTrace();
+		}
+        trans.setOutputProperty(OutputKeys.INDENT, "yes");
+        try {
+			trans.transform(new DOMSource(sigdoc), new StreamResult(os2));
+		} catch (TransformerException e) {
+			e.printStackTrace();
+		}
+		
     }
 }

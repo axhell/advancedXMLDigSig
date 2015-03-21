@@ -22,6 +22,7 @@ public class X509CertificateValidation {
 	//chain of certificate, trust anchors constraints
 	private String[] report;
 	
+	//Constructor with X509Certificate input
 	X509CertificateValidation(InputStream inStream){
 		CertificateFactory cf = null;
 		try {
@@ -38,6 +39,7 @@ public class X509CertificateValidation {
 		this.report = new String[10];
 	}
 	
+	//Constructor with X509Certificate input
 	public X509CertificateValidation(X509Certificate cert) {
 		this.cert = cert;
 		this.report = new String[10];
@@ -47,7 +49,7 @@ public class X509CertificateValidation {
 		this.Verify(ca);
 		this.ValidateCryptoConstraints();
 		this.checkValidity();
-		System.out.println("--Certificate Validation Report-- ");
+		System.out.println("--Certificate constraints validation report-- ");
 		for(int i = 0; i<this.report.length;i++){
 			if(report[i]!= null)System.out.println(this.report[i]);
 		}
@@ -77,7 +79,7 @@ public class X509CertificateValidation {
 		this.Verify(ca);
 		this.ValidateCryptoConstraints();
 		this.checkValidity();
-		System.out.println("--Certificate Validation Report-- ");
+		System.out.println("--Certificate constraints validation report-- ");
 		for(int i = 0; i<this.report.length;i++){
 			if(report[i]!= null)System.out.println(this.report[i]);
 		}
@@ -107,13 +109,13 @@ public class X509CertificateValidation {
 		try {
 			this.cert.verify(caPubKey);
 			isValid = true;
-			this.report[0] = "VALID - Cryptographic Verification";
+			this.report[0] = "VALID - Certificate cryptographic Verification";
 			this.report[9] = "INFO - Issuer: "+ this.cert.getIssuerDN()+" Subject: "+this.cert.getSubjectDN();
 		} catch (InvalidKeyException | NoSuchAlgorithmException
 				| NoSuchProviderException | SignatureException
 				| CertificateException e) {
 			e.printStackTrace();
-			this.report[0] = "INVALID/SIG_CRYPTO_FAILURE - Cryptographic Verification";
+			this.report[0] = "INVALID/SIG_CRYPTO_FAILURE - Certificate cryptographic Verification";
 			isValid = false;
 		}
 		

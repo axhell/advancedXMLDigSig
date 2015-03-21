@@ -9,6 +9,8 @@ import java.io.OutputStream;
 
 
 
+
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -37,13 +39,13 @@ public class GenXAdESSignature {
     String secondRef;
     String baseUri;
 	
-    public GenXAdESSignature(String cminstancepath, String cmtpath, String baseUri) {
-		this.firstRef = cminstancepath;
-		this.secondRef = cmtpath;
+    public GenXAdESSignature(String cminstfn, String cmtfn, String baseUri) {
+		this.firstRef = cminstfn;
+		this.secondRef = cmtfn;
 		this.baseUri = baseUri;
 	}
 
-	public void signCMiXAdESBES(XadesSigner signer) {
+	public void signCMiXAdESBES(XadesSigner signer) throws Exception {
 		/**
 		 * Add the object reference to the signature
 		 */
@@ -71,14 +73,9 @@ public class GenXAdESSignature {
 		
 		
 		// Create the Document that will hold the resulting XMLSignature
-        DocumentBuilderFactory sigdbf = DocumentBuilderFactory.newInstance();
+		DocumentBuilderFactory sigdbf = DocumentBuilderFactory.newInstance();
         sigdbf.setNamespaceAware(true);
-        Document sigdoc = null;
-        try {
-			sigdoc = sigdbf.newDocumentBuilder().newDocument();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
+        Document sigdoc = sigdbf.newDocumentBuilder().newDocument();
 		
         XadesSignatureResult result = null;
         try {
@@ -92,9 +89,10 @@ public class GenXAdESSignature {
         sv.genSigVerifyForm();
         
         // output the resulting document
-       writeSignedDocumentToFile(sigdoc);
         
-              
+        XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(sigdoc , this.baseUri);
+		vv.validate();      
+		
 		
 	}
 	
@@ -102,7 +100,7 @@ public class GenXAdESSignature {
 	
 	
 
-	public void signCMtempXAdESBES(XadesSigner signer) throws Exception {
+	public Document signCMtempXAdESBES(XadesSigner signer) throws Exception {
 		/**
 		 * Add the object reference to the signature
 		 */
@@ -135,12 +133,12 @@ public class GenXAdESSignature {
         sv.genSigVerifyForm();
         
         
-        XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(sigdoc , "file:/C:/Users/axhell/Documents/Github/XMLDigitalSignature/XMLDigSig/");
+        XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(sigdoc , this.baseUri);
 		vv.validate();
         
-        
+        return sigdoc;
         // output the resulting document
-        writeSignedDocumentToFile(sigdoc);
+        //writeSignedDocumentToFile(sigdoc);
         
      
 	}

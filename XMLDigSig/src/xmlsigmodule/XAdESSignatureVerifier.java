@@ -26,7 +26,7 @@ public boolean genSigVerifyForm(){
 	boolean isValid = false;
 	this.checkCanonicalMethod(this.genResult.getSignature().getSignedInfo().getSignatureMethodURI());
 	this.checkSignatureMethod(this.genResult.getSignature().getSignedInfo().getCanonicalizationMethodURI());
-	System.out.println("--Signature Validation Report-- ");
+	System.out.println("--Signature constraints validation report-- ");
 	for(int i = 0; i<this.report.length;i++){
 		if(report[i]!= null)System.out.println(this.report[i]);
 		}
@@ -39,7 +39,7 @@ public boolean ValSigVerifyForm() {
 	this.checkCanonicalMethod(this.verResult.getSignatureAlgorithmUri());
 	this.checkSignatureMethod(this.verResult.getCanonicalizationAlgorithmUri());
 	this.checkSignatureForm(this.verResult.getSignatureForm());
-	System.out.println("--Signature Validation Report-- ");
+	System.out.println("--Signature constraints validation report-- ");
 	for(int i = 0; i<this.report.length;i++){
 		if(report[i]!= null)System.out.println(this.report[i]);
 		}

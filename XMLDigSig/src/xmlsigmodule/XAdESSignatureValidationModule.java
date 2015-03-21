@@ -10,17 +10,8 @@ import java.security.NoSuchProviderException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 
-
-
-
-
-
-
-
-
 import javax.xml.crypto.dsig.XMLSignature;
 
-import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -48,8 +39,7 @@ public class XAdESSignatureValidationModule {
 	
 	Element signature;
 	String baseuri;
-	//X509CertificateValidation cv;
-	//XAdESSignatureVerifier sv;
+	//X509Certificate TA;
 	
 	public XAdESSignatureValidationModule(Document signature, String baseuri) throws Exception {
 		
@@ -57,38 +47,20 @@ public class XAdESSignatureValidationModule {
 		//this.signature = (Element)signature.getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE).item(0);
 		this.signature = getSignatureElement(signature);
 		this.baseuri = baseuri;
-		
-		//KeyInfo ki;
-		//ki.this.signature.getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_KEYINFO);
-		//X509Data xdata = new X509Data();
-		//X509CertSelector certSelector = new X509CertSelector();
-		//certSelector = 
-		
-	
-		
-		
 	
 	}
 	
-	public void validate() {
+	public boolean validate() throws XAdES4jException {
+		boolean isValid = false;
+		
 		XadesVerificationProfile p = buildVerProfile();
 		
-		XadesVerifier v = null;
-		try {
-			v = p.newVerifier();
-		} catch (XadesProfileResolutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		XadesVerifier v = p.newVerifier();
+		
 		SignatureSpecificVerificationOptions options = new SignatureSpecificVerificationOptions().useBaseUri(this.baseuri);
 		
-		XAdESVerificationResult r = null;
-		try {
-			r = v.verify(this.signature, options);
-		} catch (XAdES4jException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		XAdESVerificationResult r = v.verify(this.signature, options);
+
 		
 		System.out.println();
 		System.out.println("Verify the signer's certificate: ");
@@ -101,8 +73,7 @@ public class XAdESSignatureValidationModule {
 		XAdESSignatureVerifier sv = new XAdESSignatureVerifier(r);
         sv.ValSigVerifyForm();
         
-        System.out.println(r.getQualifyingProperties().getSignedProperties());
-		
+        return isValid;
 		
 		
 	}
