@@ -14,7 +14,7 @@ public class TestModule {
 		}else if(args[0].equalsIgnoreCase("-CMinsSign")){
 			CMInstanceSignatureGenModule.GenCMinstSignature();
 		}else if(args[0].equalsIgnoreCase("-CMinsVerify")){
-			XMLSignatureVerifyModule.VerifyCMinsSignature();
+			//XAdESSignatureValidationModule.VerifyCMinsSignature();
 		}
 
 	}

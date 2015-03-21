@@ -73,7 +73,6 @@ public class ValidateSignature {
 	XMLSignatureFactory factory = XMLSignatureFactory.getInstance("DOM"); 
 	//Extract the signature into XMLsignature object(unmarshaling)
 	XMLSignature signature = factory.unmarshalXMLSignature(valContext); 
-	
 	boolean coreValidity = signature.validate(valContext); 
 	
 	System.out.println("signature is: "+ coreValidity);

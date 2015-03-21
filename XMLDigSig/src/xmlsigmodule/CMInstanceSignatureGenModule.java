@@ -1,18 +1,18 @@
 package xmlsigmodule;
 
 import java.io.*;
-import java.net.URLEncoder;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 import javax.security.cert.CertificateEncodingException;
-import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+
+
+
+
+
 
 
 
@@ -48,7 +48,8 @@ import xmlsigcore.RSAPrivateKeyReader;
 
 
 public class CMInstanceSignatureGenModule {
-	public static void GenCMinstSignature() throws IOException, CertificateEncodingException, ParserConfigurationException{
+	public static void GenCMinstSignature() throws Exception{
+		final String PATH = "file:/C:/Users/axhell/Documents/Github/XMLDigitalSignature/XMLDigSig/";
 		
 		X509CertificateValidation certCA = null;
 		X509CertificateValidation certUser = null;
@@ -57,6 +58,7 @@ public class CMInstanceSignatureGenModule {
 		String certCAfile = null;
 		String certUserfile = null;
 		String cmtemppath = null;
+		String cmtempfn = null;
 		String cminstpath = null;
 		String cmtsignature = null;
 
@@ -97,42 +99,44 @@ public class CMInstanceSignatureGenModule {
 		}
 		certUser = new X509CertificateValidation(inStream);
 		
+		PrivateKey privKCA = null;
+		try {
+			privKCA = RSAPrivateKeyReader.getPrivKeyFromFile("cert/ca_rsa_priveKey.der");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		PrivateKey privKuser = null;
 		try {
-			privKuser = RSAPrivateKeyReader.getPrivKeyFromFile("cert/ca_rsa_priveKey.der");
+			privKuser = RSAPrivateKeyReader.getPrivKeyFromFile("cert/my_rsa_priveKey.der");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		
-		
-		
-		System.out.println("CM Template absolute path (URI): ");
+		System.out.println("CM Template file's name: ");
 		br = new BufferedReader(new InputStreamReader(System.in));
 		try {
-			cmtemppath = br.readLine();
+			cmtempfn = br.readLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		System.out.println("CM Template Signature relative path (URI): ");
+		
+		
+		
+		System.out.println("CM Template Signature file's name: ");
 		br = new BufferedReader(new InputStreamReader(System.in));
 		try {
 			cmtsignature = br.readLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);		
-		DocumentBuilder builder = dbf.newDocumentBuilder();
-		Document signature = null;
-		try {
-			signature = builder.parse(new FileInputStream(cmtsignature));
-		} catch (SAXException e1) {
-			e1.printStackTrace();
-		}
-	
-		System.out.println("CM Instance absolute path (URI): ");
+		
+		Document signature = getDocument(cmtsignature);
+		
+		
+		
+		System.out.println("CM Instance file's name: ");
 		br = new BufferedReader(new InputStreamReader(System.in));
 		try {
 			cminstpath = br.readLine();
@@ -155,23 +159,23 @@ public class CMInstanceSignatureGenModule {
 		certUser.Validate(certCA.cert);
 		
 		
-		/*
+		
 		//create CM template signature for test only
-		XadesSigner signerCMT = getSigner(certCA.cert, privKuser);
-		//file://C:/Users/axhell/Documents/Github/XMLDigitalSignature/XMLDigSig/CMtemp.xml";
+		XadesSigner signerCMT = getSigner(certCA.cert, privKCA);
+		//file:/C:/Users/axhell/Documents/Github/XMLDigitalSignature/XMLDigSig/CMtemp.xml";
 		//genara firma
-		GenXAdESSignature newSig = new GenXAdESSignature(cmtemppath , null);
+		GenXAdESSignature newSig = new GenXAdESSignature(cmtempfn , null, PATH);
 		//Sign 
 		newSig.signCMtempXAdESBES(signerCMT);
-		*/
+		
+		//GenEnvXAdESSignature newEnveloped = new GenEnvXAdESSignature(cmtempfn);
+		//newEnveloped.signCMtempXAdESBES(signerCMT);
 		
 		System.out.println();
-		try {
-			XMLSignatureVerifyModule vv = new XMLSignatureVerifyModule(signature, cmtemppath);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+			//XMLSignatureVerifyModule vv = new XMLSignatureVerifyModule(signature, PATH);
+			//vv.validate();
+		
 		
 		
 		
@@ -183,7 +187,7 @@ public class CMInstanceSignatureGenModule {
 		/**
 		 * Generate the signature content
 		 */
-		//GenXAdESSignature newSigI = new GenXAdESSignature(cminstpath , cmtemppath);
+		//GenXAdESSignature newSigI = new GenXAdESSignature(cminstpath , PATH);
 		/**
 		 * Sign
 		 */
@@ -199,9 +203,9 @@ public class CMInstanceSignatureGenModule {
 	
 
 	private static XadesSigner getSigner(X509Certificate cert,
-			PrivateKey privKCA) {
+			PrivateKey privK) {
 		try {
-			KeyingDataProvider kp = new DirectKeyingDataProvider(cert, privKCA);
+			KeyingDataProvider kp = new DirectKeyingDataProvider(cert, privK);
 			XadesSigningProfile p = new XadesBesSigningProfile(kp);
 			return p.newSigner();
 			} catch (XadesProfileResolutionException e) {
@@ -216,22 +220,22 @@ public class CMInstanceSignatureGenModule {
      * Load a Document from an XML file
      * @param path The path to the file
      * @return The document extracted from the file
+	 * @throws ParserConfigurationException 
+	 * @throws IOException 
+	 * @throws SAXException 
+	 * @throws FileNotFoundException 
      */
-    private static Document getDocument(String path) {
-        try {
-            // Load the XML to append the signature to.
-            File fXmlFile = new File(path);
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(fXmlFile);
-     
-            return doc;
-        } catch (SAXException ex) {
-            return null;
-        } catch (IOException ex) {
-            return null;
-        } catch (ParserConfigurationException ex) {
-            return null;
-        }
+    private static Document getDocument(String filename) throws ParserConfigurationException, FileNotFoundException, SAXException, IOException {
+       Document signature = null;
+    	
+    	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);		
+		DocumentBuilder builder = dbf.newDocumentBuilder();
+		signature = builder.parse(new FileInputStream(filename));
+		
+		
+		
+    
+		return signature;
     }
 }

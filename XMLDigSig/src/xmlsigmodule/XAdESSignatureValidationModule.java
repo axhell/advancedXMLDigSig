@@ -11,34 +11,52 @@ import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 
 
+
+
+
+
+
+
+
+import javax.xml.crypto.dsig.XMLSignature;
+
 import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import xades4j.XAdES4jException;
 import xades4j.providers.CertificateValidationProvider;
 import xades4j.providers.impl.PKIXCertificateValidationProvider;
 import xades4j.utils.FileSystemDirectoryCertStore;
+import xades4j.utils.XadesProfileResolutionException;
 import xades4j.verification.SignatureSpecificVerificationOptions;
 import xades4j.verification.XAdESVerificationResult;
 import xades4j.verification.XadesVerificationProfile;
 import xades4j.verification.XadesVerifier;
 
-public class XMLSignatureVerifyModule {
-	/**
-	 * Trust Anchors data
-	 */
-	private static final String truststore = "cert/truststore.jks";
-	private static final String passwd = "password";
+public class XAdESSignatureValidationModule {
+	
+	//Trust Anchors data
+	private static final String TRUSTSTORE = "cert/truststore.jks";
+	private static final String PASSWD = "password";
+	
+	//Certificate Store directory
+	private static final String CERTSTORE = "cert/CA/";
+	
 	
 	Element signature;
 	String baseuri;
-	X509CertificateValidation cv;
-	XAdESSignatureVerifier sv;
+	//X509CertificateValidation cv;
+	//XAdESSignatureVerifier sv;
 	
-	public XMLSignatureVerifyModule(Document signature, String baseuri) throws Exception {
+	public XAdESSignatureValidationModule(Document signature, String baseuri) throws Exception {
 		
 		
-		this.signature = (Element)signature.getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE).item(0);
+		//this.signature = (Element)signature.getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE).item(0);
+		this.signature = getSignatureElement(signature);
+		this.baseuri = baseuri;
 		
 		//KeyInfo ki;
 		//ki.this.signature.getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_KEYINFO);
@@ -46,31 +64,85 @@ public class XMLSignatureVerifyModule {
 		//X509CertSelector certSelector = new X509CertSelector();
 		//certSelector = 
 		
+	
 		
+		
+	
+	}
+	
+	public void validate() {
 		XadesVerificationProfile p = buildVerProfile();
-		XadesVerifier v = p.newVerifier();
-		SignatureSpecificVerificationOptions options = new SignatureSpecificVerificationOptions().useBaseUri(this.baseuri);
-		XAdESVerificationResult r = v.verify(this.signature, options);
 		
+		XadesVerifier v = null;
+		try {
+			v = p.newVerifier();
+		} catch (XadesProfileResolutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		SignatureSpecificVerificationOptions options = new SignatureSpecificVerificationOptions().useBaseUri(this.baseuri);
+		
+		XAdESVerificationResult r = null;
+		try {
+			r = v.verify(this.signature, options);
+		} catch (XAdES4jException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println();
 		System.out.println("Verify the signer's certificate: ");
 		X509CertificateValidation xv = new X509CertificateValidation(r.getValidationCertificate());
 		xv.Validate(xv.cert);
 		
-		System.out.println(r.getSignatureForm());
-		System.out.println(r.getSignatureAlgorithmUri());
-		System.out.println(r.getSignedDataObjects().size());
-		System.out.println(r.getQualifyingProperties().all().size());
 	
-	}
-	public static void VerifyCMinsSignature() {
-		// TODO Auto-generated method stub
+		System.out.println();
+		System.out.println("Verify the signature form: ");
+		XAdESSignatureVerifier sv = new XAdESSignatureVerifier(r);
+        sv.ValSigVerifyForm();
+        
+        System.out.println(r.getQualifyingProperties().getSignedProperties());
+		
+		
 		
 	}
-
-	public static XadesVerificationProfile buildVerProfile(){
+	
+	
+	
+	
+	private Element getSignatureElement(Document signature) throws Exception{
+         //final NodeList nList = signature.getElementsByTagName("ds:Signature");
+         
+         NodeList nList = signature.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
+        		if (nList.getLength() == 0) {
+        		  throw new Exception("Cannot find Signature element");
+        		} 
+         
+         Element elem = null;
+         for (int temp = 0; temp < nList.getLength(); temp++) {
+             final Node nNode = nList.item(temp);
+             if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                 elem = (Element) nNode;
+             }
+         }
+         elem.normalize();
+         
+         return elem;
+	}
+	/*
+	public 
+	final NodeList nList2 = doc.getElementsByTagName("ds:X509Certificate");
+    final List<String> certDataList = new ArrayList<String>();
+    for (int temp = 0; temp < nList2.getLength(); temp++) {
+        final Node nNode = nList2.item(temp);
+        certDataList.add(nNode.getTextContent());
+    }
+    certList = getCert(certDataList);
+	*/
+	private static XadesVerificationProfile buildVerProfile(){
 		FileSystemDirectoryCertStore certStore = null;
 		try {
-			certStore = new FileSystemDirectoryCertStore("cert/CA/");
+			certStore = new FileSystemDirectoryCertStore(CERTSTORE);
 		} catch (CertificateException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
@@ -85,9 +157,9 @@ public class XMLSignatureVerifyModule {
 			e1.printStackTrace();
 		}
 		
-		char[] password = passwd.toCharArray();
+		char[] password = PASSWD.toCharArray();
 		try {
-			trustAnchors.load(new FileInputStream(truststore), password);
+			trustAnchors.load(new FileInputStream(TRUSTSTORE), password);
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -116,4 +188,5 @@ public class XMLSignatureVerifyModule {
 		XadesVerificationProfile p = new XadesVerificationProfile(certValidator);
 		 return p;
 	}
+	
 }
