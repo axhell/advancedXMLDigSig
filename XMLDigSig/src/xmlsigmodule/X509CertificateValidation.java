@@ -62,64 +62,107 @@ public class X509CertificateValidation {
 		try {
 			this.cert.checkValidity();
 			isValid = true;
-			this.report[2]= "VALID - Certificate is valid for the current time: "+date;
+			this.addToReport("VALID - Certificate is valid for the current time: "+date);
 		} catch (CertificateExpiredException e) {
-			this.report[2]= "INDETERMINATE/OUT_OF_TIME_BOUNDS - Certificate is expired.";
+			this.addToReport("INDETERMINATE/OUT_OF_TIME_BOUNDS - Certificate is expired.");
 			isValid = false;
 			e.printStackTrace();
 		} catch (CertificateNotYetValidException e) {
-			this.report[2]= "INDETERMINATE/OUT_OF_TIME_BOUNDS - Certificate is not yet valid.";
+			this.addToReport("INDETERMINATE/OUT_OF_TIME_BOUNDS - Certificate is not yet valid.");
 			e.printStackTrace();
 		}
 		
 		return isValid;
 	}
 
-	public void Validate(X509Certificate ca){
-		this.Verify(ca);
+	public boolean Validate(X509Certificate ca){
+		boolean isValid=false;
+		
 		this.ValidateCryptoConstraints();
 		this.checkValidity();
+		if(!this.checkSelfSigned()){ this.checkKeyUsage();}
+		this.Verify(ca);
 		System.out.println("--Certificate constraints validation report-- ");
 		for(int i = 0; i<this.report.length;i++){
 			if(report[i]!= null)System.out.println(this.report[i]);
 		}
+		
+		return isValid;
 	}
 	
+	
+	private boolean checkKeyUsage(){
+		boolean isValid = false;
+		boolean usage[] = this.cert.getKeyUsage();
+		
+		if(usage !=null && usage[1]){
+			isValid = true; this.addToReport("VALID - Key usage is set as nonRepudiantion");
+			}
+		else{
+				isValid = false; this.addToReport("INDETERMINATE - Key usage unknown");
+			}
+		
+		return isValid;
+	}
 	
 	private boolean ValidateCryptoConstraints() {
 		boolean isValid = false;
 		String oid = this.cert.getSigAlgOID();
 		
-		if(oid.equals("1.2.840.113549.1.1.13")){this.report[1] = "VALID - Algorithm SHA512 with RSA";   isValid = true;}
-		else if(oid.equals("1.2.840.113549.1.1.11")){this.report[1] = "VALID - Algorithm SHA256 with RSA";   isValid = true;}
-		else if(oid.equals("1.2.840.113549.1.1.5")){this.report[1] = "INVALID/CRYPTO_CONSTRAINTS_FAILURE - Algorithm SHA1 with RSA";   isValid = false;}
-		else if(oid.equals("1.2.840.113549.1.1.4")){this.report[1] = "INVALID/CRYPTO_CONSTRAINTS_FAILURE - Algorithm MD5 with RSA";   isValid = false;}
+		if(oid.equals("1.2.840.113549.1.1.13")){this.addToReport("VALID - Algorithm SHA512 with RSA");   isValid = true;}
+		else if(oid.equals("1.2.840.113549.1.1.11")){this.addToReport("VALID - Algorithm SHA256 with RSA");   isValid = true;}
+		else if(oid.equals("1.2.840.113549.1.1.5")){this.addToReport("INVALID/CRYPTO_CONSTRAINTS_FAILURE - Algorithm SHA1 with RSA");   isValid = false;}
+		else if(oid.equals("1.2.840.113549.1.1.4")){this.addToReport("INVALID/CRYPTO_CONSTRAINTS_FAILURE - Algorithm MD5 with RSA");   isValid = false;}
 		else{
-			this.report[1] = "INVALID/CRYPTO_CONSTRAINTS_FAILURE - Unknown";   isValid = false;
+			this.addToReport("INVALID/CRYPTO_CONSTRAINTS_FAILURE - Unknown");   isValid = false;
 		}
 		
 		return isValid;
 		
 	}
 
-
+	
+	public boolean checkSelfSigned(){
+		boolean isValid = false;
+		
+		if (this.cert.getIssuerDN().equals(this.cert.getSubjectDN())){
+			isValid = true; this.addToReport("Certification Authority self-signed certificate");
+		}
+		
+		return isValid;
+	}
+	
 	public boolean Verify(X509Certificate ca){
 		PublicKey caPubKey = ca.getPublicKey();
 		boolean isValid = false;
 		try {
 			this.cert.verify(caPubKey);
 			isValid = true;
-			this.report[0] = "VALID - Certificate cryptographic Verification";
-			this.report[9] = "INFO - Issuer: "+ this.cert.getIssuerDN()+" Subject: "+this.cert.getSubjectDN();
+			this.addToReport("VALID - Certificate cryptographic Verification");
+			this.addToReport("INFO - Issuer: "+ this.cert.getIssuerDN()+" Subject: "+this.cert.getSubjectDN());
 		} catch (InvalidKeyException | NoSuchAlgorithmException
 				| NoSuchProviderException | SignatureException
 				| CertificateException e) {
 			e.printStackTrace();
-			this.report[0] = "INVALID/SIG_CRYPTO_FAILURE - Certificate cryptographic Verification";
+			this.addToReport("INVALID/SIG_CRYPTO_FAILURE - Certificate cryptographic Verification");
 			isValid = false;
 		}
 		
 		return isValid;
+	}
+	
+	private void addToReport(String s){
+		
+		int i = this.report.length;
+		int j = 0;
+		boolean v = false;
+		
+		while(!v && j<i){
+			if(this.report[j] == null){ this.report[j] = s; v= true;}
+			
+			j++;
+		}
+		
 	}
 	
 	public void showAlgo(){

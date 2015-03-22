@@ -35,6 +35,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+
 //import org.apache.xml.security.stax.ext.Transformer;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -146,22 +147,18 @@ public class CMInstanceSignatureGenModule {
 		
 		//CM template verifica
 		
-		
-		
-		
 		inStream.close();
 		
 		System.out.println("Trust Anchor certificate validation:");
-		certCA.ValidateRootCA(certCA.cert);
+		boolean tacert = certCA.Validate(certCA.cert);
 		System.out.println();
 		System.out.println("User certificate validation:");
-		certUser.Validate(certCA.cert);
+		boolean ucert = certUser.Validate(certCA.cert);
 		
-		
+		System.out.println();
 		System.out.println("Certification Model Template signature validation: ");
 		//create CM template signature for test only
 		XadesSigner signerCMT = getSigner(certCA.cert, privKCA);
-		//file:/C:/Users/axhell/Documents/Github/XMLDigitalSignature/XMLDigSig/CMtemp.xml";
 		//genara firma
 		GenXAdESSignature newSig = new GenXAdESSignature(cmtempfn , null, PATH);
 		//Sign
@@ -173,12 +170,18 @@ public class CMInstanceSignatureGenModule {
 		
 		System.out.println();
 		
-			//XMLSignatureVerifyModule vv = new XMLSignatureVerifyModule(signature, PATH);
-			//vv.validate();
+		//XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(signature , PATH);
+		//boolean cmt = vv.validate();
+		boolean cmt = false;
 		
 		
 		
 		
+		
+		
+		
+		if(tacert && ucert && cmt){
+			
 		
 		/**
 		 * Create a signer for the Certification Model Instance
@@ -192,8 +195,12 @@ public class CMInstanceSignatureGenModule {
 		 * Sign
 		 */
 		//writeSignedDocumentToFile(newSigI.signCMtempXAdESBES(signerCMI));
-		
-		
+			System.out.println();
+			System.out.println("Certification Model Instance signed correctly");
+		}else{
+			System.out.println();
+			System.out.println("Error, Certification Model Instance not signed");
+		}
 		
 	}
 

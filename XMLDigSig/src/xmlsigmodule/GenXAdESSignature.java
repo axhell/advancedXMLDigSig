@@ -45,18 +45,23 @@ public class GenXAdESSignature {
 		this.baseUri = baseUri;
 	}
 
-	public void signCMiXAdESBES(XadesSigner signer) throws Exception {
+	public Document signCMiXAdESBES(XadesSigner signer) throws Exception {
 		/**
-		 * Add the object reference to the signature
+		 * Add Certification Model instance to reference
 		 */
 		DataObjectDesc cminst = new DataObjectReference(this.firstRef)
 		.withTransform(XPath2Filter.intersect("/"))
 		.withDataObjectFormat(new DataObjectFormatProperty("application/xml"))//MimeTipe qualify
+		.withCommitmentType(CommitmentTypeProperty.proofOfOrigin())
 		;
 	
+		/**
+		 * Add Certification Model Template to reference
+		 */
 		DataObjectDesc cmtemp = new DataObjectReference(this.secondRef)
 		.withTransform(XPath2Filter.intersect("/"))
 		.withDataObjectFormat(new DataObjectFormatProperty("application/xml"))//MimeTipe qualify
+		.withCommitmentType(CommitmentTypeProperty.proofOfApproval())
 		;
 		
 		
@@ -93,7 +98,7 @@ public class GenXAdESSignature {
         XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(sigdoc , this.baseUri);
 		vv.validate();      
 		
-		
+		return sigdoc;
 	}
 	
 	
