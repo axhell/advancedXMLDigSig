@@ -78,10 +78,19 @@ public class X509CertificateValidation {
 	public boolean Validate(X509Certificate ca){
 		boolean isValid=false;
 		
-		this.ValidateCryptoConstraints();
-		this.checkValidity();
-		if(!this.checkSelfSigned()){ this.checkKeyUsage();}
-		this.Verify(ca);
+		
+		if(!this.checkSelfSigned()){ 
+			if (this.checkKeyUsage()){
+				isValid = true;				
+			}else isValid = false;
+		}
+		if (
+				this.ValidateCryptoConstraints() &&
+				this.checkValidity() &&
+				this.Verify(ca)){
+			isValid = true;
+		}else isValid = false;
+		
 		System.out.println("--Certificate constraints validation report-- ");
 		for(int i = 0; i<this.report.length;i++){
 			if(report[i]!= null)System.out.println(this.report[i]);

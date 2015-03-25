@@ -42,7 +42,7 @@ public class CMInstanceSignatureVerModule {
 		Document signature = getDocument(cminstsig);
 		
 		
-		XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(signature , PATH);
+		XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(signature , null, PATH);
 		vv.validate(); 
 		
 	}

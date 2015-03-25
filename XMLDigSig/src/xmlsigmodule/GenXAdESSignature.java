@@ -48,6 +48,7 @@ public class GenXAdESSignature {
 	public Document signCMiXAdESBES(XadesSigner signer) throws Exception {
 		/**
 		 * Add Certification Model instance to reference
+		 * Commitment types proof of origin defined in ETSI TS 101 903 V1.4.1 (2009-06)
 		 */
 		DataObjectDesc cminst = new DataObjectReference(this.firstRef)
 		.withTransform(XPath2Filter.intersect("/"))
@@ -57,6 +58,7 @@ public class GenXAdESSignature {
 	
 		/**
 		 * Add Certification Model Template to reference
+		 * Commitment types proof of origin defined in ETSI TS 101 903 V1.4.1 (2009-06)
 		 */
 		DataObjectDesc cmtemp = new DataObjectReference(this.secondRef)
 		.withTransform(XPath2Filter.intersect("/"))
@@ -95,8 +97,8 @@ public class GenXAdESSignature {
         
         // output the resulting document
         
-        XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(sigdoc , this.baseUri);
-		vv.validate();      
+       // XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(sigdoc , this.baseUri);
+		//vv.validate();      
 		
 		return sigdoc;
 	}
@@ -138,8 +140,8 @@ public class GenXAdESSignature {
         sv.genSigVerifyForm();
         
         
-        XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(sigdoc , this.baseUri);
-		vv.validate();
+        //XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(sigdoc , this.baseUri);
+		//vv.validate();
         
         return sigdoc;
         // output the resulting document
@@ -148,31 +150,5 @@ public class GenXAdESSignature {
      
 	}
 	
-	private void writeSignedDocumentToFile(Document sigdoc) {
-		OutputStream os2 = null;
-        try {
-			os2 = new FileOutputStream("CMISignature.xml");
-		} catch (FileNotFoundException e1) {
-		
-			e1.printStackTrace();
-		}
 
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer trans = null;
-		try {
-			trans = tf.newTransformer();
-		} catch (TransformerConfigurationException e) {
-			e.printStackTrace();
-		}
-        trans.setOutputProperty(OutputKeys.INDENT, "yes");
-        try {
-			trans.transform(new DOMSource(sigdoc), new StreamResult(os2));
-		} catch (TransformerException e) {
-			e.printStackTrace();
-		}
-		
-        
-   
-	}
-	
 }

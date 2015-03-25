@@ -24,8 +24,11 @@ public XAdESSignatureVerifier(XAdESVerificationResult result) {
 
 public boolean genSigVerifyForm(){
 	boolean isValid = false;
-	this.checkCanonicalMethod(this.genResult.getSignature().getSignedInfo().getSignatureMethodURI());
-	this.checkSignatureMethod(this.genResult.getSignature().getSignedInfo().getCanonicalizationMethodURI());
+	if (
+			this.checkCanonicalMethod(this.genResult.getSignature().getSignedInfo().getSignatureMethodURI()) &&
+			this.checkSignatureMethod(this.genResult.getSignature().getSignedInfo().getCanonicalizationMethodURI())){
+		isValid = true;
+	}
 	System.out.println("--Signature constraints validation report-- ");
 	for(int i = 0; i<this.report.length;i++){
 		if(report[i]!= null)System.out.println(this.report[i]);
@@ -35,9 +38,14 @@ public boolean genSigVerifyForm(){
 
 public boolean ValSigVerifyForm() {
 	boolean isValid = false;
-	this.checkSignatureForm(this.verResult.getSignatureForm());
-	this.checkSignatureMethod(this.verResult.getCanonicalizationAlgorithmUri());
-	this.checkCanonicalMethod(this.verResult.getSignatureAlgorithmUri());
+	if ( 
+			this.checkSignatureForm(this.verResult.getSignatureForm()) &&
+			this.checkSignatureMethod(this.verResult.getCanonicalizationAlgorithmUri()) &&
+			this.checkCanonicalMethod(this.verResult.getSignatureAlgorithmUri())){
+		isValid = true;
+	}
+		
+	
 	this.addToReport("VALID - Signature cryptographic verification");
 	System.out.println("--Signature constraints validation report-- ");
 	for(int i = 0; i<this.report.length;i++){
@@ -51,7 +59,7 @@ public boolean ValSigVerifyForm() {
 private boolean checkSignatureForm(XAdESForm sf) {
 	boolean isValid = false;
 	
-	if(sf==null){this.addToReport("INVALID/SIG_CONSTRAINTS_FAILURE - Signature form not supported") ;}
+	if(sf==null) {isValid = false; this.addToReport("INVALID/SIG_CONSTRAINTS_FAILURE - Signature form not supported") ;}
 	else if(sf == XAdESForm.BES){isValid = true; this.addToReport("VALID - Signature form is XAdES-BES") ;}
 	else if(sf == XAdESForm.T){isValid = true; this.addToReport("VALID - Signature form is XAdES-T");}
 	else if(sf == XAdESForm.EPES){isValid = true; this.addToReport("VALID - Signature form is XAdES-EPES");}

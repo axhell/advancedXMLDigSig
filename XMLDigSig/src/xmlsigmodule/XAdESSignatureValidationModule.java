@@ -9,6 +9,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509CertSelector;
+import java.security.cert.X509Certificate;
 
 import javax.xml.crypto.dsig.XMLSignature;
 
@@ -39,15 +41,15 @@ public class XAdESSignatureValidationModule {
 	
 	Element signature;
 	String baseuri;
-	//X509Certificate TA;
+	X509Certificate TA;
 	
-	public XAdESSignatureValidationModule(Document signature, String baseuri) throws Exception {
+	public XAdESSignatureValidationModule(Document signature, X509Certificate cert, String baseuri) throws Exception {
 		
 		
 		//this.signature = (Element)signature.getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE).item(0);
 		this.signature = getSignatureElement(signature);
 		this.baseuri = baseuri;
-	
+		this.TA = cert;
 	}
 	
 	public boolean validate() throws XAdES4jException {
@@ -65,13 +67,15 @@ public class XAdESSignatureValidationModule {
 		System.out.println();
 		System.out.println("Verify the signer's certificate: ");
 		X509CertificateValidation xv = new X509CertificateValidation(r.getValidationCertificate());
-		xv.Validate(xv.cert);
+		if (xv.Validate(this.TA)) isValid = true;
+		else isValid = false;
 		
 	
 		System.out.println();
 		System.out.println("Verify the signature form: ");
 		XAdESSignatureVerifier sv = new XAdESSignatureVerifier(r);
-        sv.ValSigVerifyForm();
+        if (sv.ValSigVerifyForm()) isValid = true;
+		else isValid = false;
         
         return isValid;
 		
@@ -154,8 +158,7 @@ public class XAdESSignatureValidationModule {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//certStore.getStore().getCertificates().
-		//trustAnchors.getCertificate("rootCA");
+		
 		XadesVerificationProfile p = new XadesVerificationProfile(certValidator);
 		 return p;
 	}

@@ -1,0 +1,3 @@
+keytool -importcert rootCA.crt -alias rootCA -keystore truststore
+
+$ keytool -import -file userCertificate.crt -alias user -keystore truststore

@@ -36,6 +36,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 
+
 //import org.apache.xml.security.stax.ext.Transformer;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -59,7 +60,7 @@ public class CMInstanceSignatureGenModule {
 		String certUserfile = null;
 		String cmtemppath = null;
 		String cmtempfn = null;
-		String cminstpath = null;
+		String cminstfn = null;
 		String cmtsignature = null;
 
 		
@@ -139,7 +140,7 @@ public class CMInstanceSignatureGenModule {
 		System.out.println("CM Instance file's name: ");
 		br = new BufferedReader(new InputStreamReader(System.in));
 		try {
-			cminstpath = br.readLine();
+			cminstfn = br.readLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -162,19 +163,13 @@ public class CMInstanceSignatureGenModule {
 		//genara firma
 		GenXAdESSignature newSig = new GenXAdESSignature(cmtempfn , null, PATH);
 		//Sign
-		newSig.signCMtempXAdESBES(signerCMT);
-		//writeSignedDocumentToFile(newSig.signCMtempXAdESBES(signerCMT));
+		Document sigCMT = newSig.signCMtempXAdESBES(signerCMT);
+		writeSignedDocumentToFile(sigCMT);
 		
-		//GenEnvXAdESSignature newEnveloped = new GenEnvXAdESSignature(cmtempfn);
-		//newEnveloped.signCMtempXAdESBES(signerCMT);
+		XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(sigCMT , certCA.cert, PATH);
+		boolean cmt = vv.validate();  
 		
-		System.out.println();
-		
-		//XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(signature , PATH);
-		//boolean cmt = vv.validate();
-		boolean cmt = false;
-		
-		
+		System.out.println();		
 		
 		
 		
@@ -182,21 +177,24 @@ public class CMInstanceSignatureGenModule {
 		
 		if(tacert && ucert && cmt){
 			
-		
 		/**
 		 * Create a signer for the Certification Model Instance
 		 */
-		//XadesSigner signerCMI = getSigner(certUser.cert, privKuser);
+		XadesSigner signerCMI = getSigner(certUser.cert, privKuser);
 		/**
 		 * Generate the signature content
 		 */
-		//GenXAdESSignature newSigI = new GenXAdESSignature(cminstpath , PATH);
+		GenXAdESSignature newSigI = new GenXAdESSignature(cminstfn, cmtempfn, PATH);
 		/**
 		 * Sign
 		 */
-		//writeSignedDocumentToFile(newSigI.signCMtempXAdESBES(signerCMI));
+		Document sigCMI = newSigI.signCMiXAdESBES(signerCMI);
+		writeSignedDocumentToFile(sigCMI);
 			System.out.println();
 			System.out.println("Certification Model Instance signed correctly");
+			System.out.println("Certification Model Instance signature validation: ");
+			XAdESSignatureValidationModule vi = new XAdESSignatureValidationModule(sigCMI , certCA.cert, PATH);
+			vi.validate();
 		}else{
 			System.out.println();
 			System.out.println("Error, Certification Model Instance not signed");
