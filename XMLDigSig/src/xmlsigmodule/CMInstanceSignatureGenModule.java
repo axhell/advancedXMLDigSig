@@ -4,28 +4,9 @@ import java.io.*;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-import javax.security.cert.CertificateEncodingException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -35,9 +16,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-
-
-//import org.apache.xml.security.stax.ext.Transformer;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -49,6 +27,10 @@ import xmlsigcore.RSAPrivateKeyReader;
 
 
 public class CMInstanceSignatureGenModule {
+	/**
+	 * Test class to collect input needed to Certification Model Instance signature process
+	 * @throws Exception
+	 */
 	public static void GenCMinstSignature() throws Exception{
 		final String PATH = "file:/C:/Users/axhell/Documents/Github/XMLDigitalSignature/XMLDigSig/";
 		
@@ -58,15 +40,14 @@ public class CMInstanceSignatureGenModule {
 		InputStream inStream = null;
 		String certCAfile = null;
 		String certUserfile = null;
-		String cmtemppath = null;
 		String cmtempfn = null;
 		String cminstfn = null;
-		String cmtsignature = null;
+		String cmtsignatureFN = null;
 
 		
 		
-		//Definition of the Trust anchors, root CA certificate with pub key.
-		System.out.println("Root CA's certificate in DER format: ");
+		//Trust anchor's certificate (root CA)
+		System.out.println("Trust Anchor's X509Certificate in DER format: ");
 		br = new BufferedReader(new InputStreamReader(System.in));
 		try {
 			certCAfile = br.readLine();
@@ -84,8 +65,8 @@ public class CMInstanceSignatureGenModule {
 		
 		
 		
-		//User certificate with pub key.
-		System.out.println("User's certificate in DER format: ");
+		//User's certificate.
+		System.out.println("User's X509Certificate in DER format: ");
 		br = new BufferedReader(new InputStreamReader(System.in));
 		try {
 			certUserfile = br.readLine();
@@ -106,6 +87,7 @@ public class CMInstanceSignatureGenModule {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 		PrivateKey privKuser = null;
 		try {
 			privKuser = RSAPrivateKeyReader.getPrivKeyFromFile("cert/my_rsa_priveKey.der");
@@ -128,12 +110,12 @@ public class CMInstanceSignatureGenModule {
 		System.out.println("CM Template Signature file's name: ");
 		br = new BufferedReader(new InputStreamReader(System.in));
 		try {
-			cmtsignature = br.readLine();
+			cmtsignatureFN = br.readLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		Document signature = getDocument(cmtsignature);
+		Document cmtsignature = getDocument(cmtsignatureFN);
 		
 		
 		
@@ -156,6 +138,7 @@ public class CMInstanceSignatureGenModule {
 		System.out.println("User certificate validation:");
 		boolean ucert = certUser.Validate(certCA.cert);
 		
+		//elimina da qui
 		System.out.println();
 		System.out.println("Certification Model Template signature validation: ");
 		//create CM template signature for test only
@@ -165,7 +148,8 @@ public class CMInstanceSignatureGenModule {
 		//Sign
 		Document sigCMT = newSig.signCMtempXAdESBES(signerCMT);
 		writeSignedDocumentToFile(sigCMT);
-		
+		//a qui		
+		//Cambia sigCMT con cmtsignature
 		XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(sigCMT , certCA.cert, PATH);
 		boolean cmt = vv.validate();  
 		
@@ -173,28 +157,27 @@ public class CMInstanceSignatureGenModule {
 		
 		
 		
-		
-		
+		/**
+		 * Enable signature process only if 
+		 * trust anchor's certificate AND user's certificate AND CM template's signature
+		 * are valid.
+		 */
 		if(tacert && ucert && cmt){
 			
-		/**
-		 * Create a signer for the Certification Model Instance
-		 */
-		XadesSigner signerCMI = getSigner(certUser.cert, privKuser);
-		/**
-		 * Generate the signature content
-		 */
-		GenXAdESSignature newSigI = new GenXAdESSignature(cminstfn, cmtempfn, PATH);
-		/**
-		 * Sign
-		 */
-		Document sigCMI = newSigI.signCMiXAdESBES(signerCMI);
-		writeSignedDocumentToFile(sigCMI);
+			/** Create a signer for the Certification Model Instance */
+			XadesSigner signerCMI = getSigner(certUser.cert, privKuser);
+			/** Generate the signature content */
+			GenXAdESSignature newSigI = new GenXAdESSignature(cminstfn, cmtempfn, PATH);
+			/** Sign */
+			Document sigCMI = newSigI.signCMiXAdESBES(signerCMI);
 			System.out.println();
-			System.out.println("Certification Model Instance signed correctly");
 			System.out.println("Certification Model Instance signature validation: ");
 			XAdESSignatureValidationModule vi = new XAdESSignatureValidationModule(sigCMI , certCA.cert, PATH);
-			vi.validate();
+				if(vi.validate()){
+					writeSignedDocumentToFile(sigCMI);
+					System.out.println();
+					System.out.println("Certification Model Instance signed correctly");
+				}	
 		}else{
 			System.out.println();
 			System.out.println("Error, Certification Model Instance not signed");
@@ -206,9 +189,13 @@ public class CMInstanceSignatureGenModule {
 	       
 	
 	
-
-	private static XadesSigner getSigner(X509Certificate cert,
-			PrivateKey privK) {
+	/**
+	 * Create XadesSigner object representing user for CM instance signature process.
+	 * @param cert User's X509Certificate
+	 * @param privK User's RSA private key
+	 * @return XadesSigner object
+	 */
+	private static XadesSigner getSigner(X509Certificate cert, PrivateKey privK) {
 		try {
 			KeyingDataProvider kp = new DirectKeyingDataProvider(cert, privK);
 			XadesSigningProfile p = new XadesBesSigningProfile(kp);
@@ -223,8 +210,8 @@ public class CMInstanceSignatureGenModule {
 	
 	/**
      * Load a Document from an XML file
-     * @param path The path to the file
-     * @return The document extracted from the file
+     * @param filename Relative path to the file
+     * @return The document parsed from the file
 	 * @throws ParserConfigurationException 
 	 * @throws IOException 
 	 * @throws SAXException 

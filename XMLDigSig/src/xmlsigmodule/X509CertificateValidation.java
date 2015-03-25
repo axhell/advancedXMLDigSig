@@ -19,7 +19,7 @@ import java.security.cert.X509Certificate;
 public class X509CertificateValidation {
 	X509Certificate cert;
 	//The report include results for cryptographic constraints, 
-	//chain of certificate, trust anchors constraints
+	// trust anchors constraints and cryptographic validation.
 	private String[] report;
 	
 	//Constructor with X509Certificate input

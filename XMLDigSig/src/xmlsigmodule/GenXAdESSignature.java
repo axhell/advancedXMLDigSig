@@ -1,28 +1,8 @@
 package xmlsigmodule;
 
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-
-
-
-
-
-
-
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import xades4j.XAdES4jException;
 import xades4j.algorithms.XPath2FilterTransform.XPath2Filter;
@@ -52,8 +32,8 @@ public class GenXAdESSignature {
 		 */
 		DataObjectDesc cminst = new DataObjectReference(this.firstRef)
 		.withTransform(XPath2Filter.intersect("/"))
-		.withDataObjectFormat(new DataObjectFormatProperty("application/xml"))//MimeTipe qualify
-		.withCommitmentType(CommitmentTypeProperty.proofOfOrigin())
+		.withDataObjectFormat(new DataObjectFormatProperty("application/xml"))//MimeType
+		.withCommitmentType(CommitmentTypeProperty.proofOfOrigin())//Signer is creator of the reference
 		;
 	
 		/**
@@ -63,20 +43,18 @@ public class GenXAdESSignature {
 		DataObjectDesc cmtemp = new DataObjectReference(this.secondRef)
 		.withTransform(XPath2Filter.intersect("/"))
 		.withDataObjectFormat(new DataObjectFormatProperty("application/xml"))//MimeTipe qualify
-		.withCommitmentType(CommitmentTypeProperty.proofOfApproval())
+		.withCommitmentType(CommitmentTypeProperty.proofOfApproval())//Signer approved only the reference
 		;
 		
 		
-		
-		
+		/**
+		 * Create the final signed object with base uri declaration enable relative uri
+		 */
 		SignedDataObjects alldata = new SignedDataObjects()
 				.withSignedDataObject(cminst).withBaseUri(this.baseUri)
 				.withSignedDataObject(cmtemp).withBaseUri(this.baseUri)
 				;
-		/**
-		* Commitment types defined in ETSI TS 101 903 V1.4.1 (2009-06).
-		* section 7.2.6.
-		*/
+		
 		
 		
 		// Create the Document that will hold the resulting XMLSignature
@@ -88,25 +66,20 @@ public class GenXAdESSignature {
         try {
 			result = signer.sign(alldata, sigdoc);
 		} catch (XAdES4jException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         
         XAdESSignatureVerifier sv = new XAdESSignatureVerifier(result);
         sv.genSigVerifyForm();
         
-        // output the resulting document
-        
-       // XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(sigdoc , this.baseUri);
-		//vv.validate();      
-		
+        //output the resulting document
 		return sigdoc;
 	}
 	
 	
 	
 	
-
+//cancella metodo
 	public Document signCMtempXAdESBES(XadesSigner signer) throws Exception {
 		/**
 		 * Add the object reference to the signature

@@ -19,8 +19,6 @@ public class TestModule {
 
 	}
 	private static void PrintUsage() {
-		// TODO Auto-generated method stub
-		
 		System.out.println("usage: TestDigSig [COMMAND]");
 		System.out.println("option: ");
 		System.out.println("-CMinsSign : generate signature for Certification Model instace");
