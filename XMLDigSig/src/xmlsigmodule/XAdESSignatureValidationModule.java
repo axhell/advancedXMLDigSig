@@ -28,7 +28,8 @@ import xades4j.verification.XadesVerifier;
 
 public class XAdESSignatureValidationModule {
 	
-	/** Trust store in JKS format for trust anchor, intermediate and user certificate chain data */
+	/** Trust store in JKS format for trust anchor, intermediate and end-entity
+	 *  certificate chain data */
 	private static final String TRUSTSTORE = "cert/truststore.jks";
 	private static final String PASSWD = "password";
 	
@@ -40,10 +41,10 @@ public class XAdESSignatureValidationModule {
 	X509Certificate TA;
 	/**
 	 * Class constructor.
-	 * @param signature
-	 * @param cert
-	 * @param baseuri
-	 * @throws Exception
+	 * @param signature document
+	 * @param cert Trust anchor certificate
+	 * @param baseuri absolute URI of the references resource 
+	 * @throws Exception Cannot find Signature element
 	 */
 	public XAdESSignatureValidationModule(Document signature, X509Certificate cert, String baseuri) throws Exception {
 		
@@ -51,7 +52,16 @@ public class XAdESSignatureValidationModule {
 		this.baseuri = baseuri;
 		this.TA = cert;
 	}
-	
+	/**
+	 * Validation process: certificate constraints validation, 
+	 * signature constraints validation
+	 * and cryptographic verification.
+	 * @return true if all validation process return true, false otherwise.
+	 * @throws XAdES4jException CertificateValidationException, 
+	 * 		   InvalidFormExtensionException,UnsupportedAlgorithmException,
+	 *     	   InvalidSignatureException,XadesProfileResolutionException
+	 *    	   ValidationDataException,XAdES4jXMLSigException.     
+	 */
 	public boolean validate() throws XAdES4jException {
 		boolean isValid = false;
 		
@@ -59,19 +69,20 @@ public class XAdESSignatureValidationModule {
 		
 		XadesVerifier v = p.newVerifier();
 		
-		SignatureSpecificVerificationOptions options = new SignatureSpecificVerificationOptions().useBaseUri(this.baseuri);
+		SignatureSpecificVerificationOptions options = 
+				new SignatureSpecificVerificationOptions()
+				.useBaseUri(this.baseuri);
 		
 		XAdESVerificationResult r = v.verify(this.signature, options);
 
-		
 		System.out.println();
-		X509CertificateValidation xv = new X509CertificateValidation(r.getValidationCertificate());
+		X509CertificateValidation xv = 
+				new X509CertificateValidation(r.getValidationCertificate());
 		if (xv.Validate(this.TA)) isValid = true;
 		else isValid = false;
 		
-	
 		System.out.println();
-		XAdESSignatureVerifier sv = new XAdESSignatureVerifier(r);
+		XAdESSignatureValidation sv = new XAdESSignatureValidation(r);
         if (sv.ValSigVerifyForm()) isValid = true;
 		else isValid = false;
         
@@ -82,7 +93,12 @@ public class XAdESSignatureValidationModule {
 	
 	
 	
-	
+	/**
+	 * Extract Signature subtree.
+	 * @param signature
+	 * @return
+	 * @throws Exception Cannot find Signature element
+	 */
 	private Element getSignatureElement(Document signature) throws Exception{
          
          NodeList nList = signature.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
@@ -101,10 +117,16 @@ public class XAdESSignatureValidationModule {
          
          return elem;
 	}
-
+	/**
+	 * This method build a profile for signature verification.
+	 * @return a verification profile
+	 */
 	private static XadesVerificationProfile buildVerProfile(){
 		FileSystemDirectoryCertStore certStore = null;
 		try {
+			/** Creates a CertStore from the contents of a file-system directory.
+			 *  The directories are recursively searched for
+			 *   X509 certificates or CRLs files  */
 			certStore = new FileSystemDirectoryCertStore(CERTSTORE);
 		} catch (CertificateException e2) {
 			e2.printStackTrace();
@@ -113,6 +135,7 @@ public class XAdESSignatureValidationModule {
 		}
 		KeyStore trustAnchors = null;
 		try {
+			/** Load the KeyStore */
 			trustAnchors = KeyStore.getInstance(KeyStore.getDefaultType());
 		} catch (KeyStoreException e1) {
 			e1.printStackTrace();
@@ -130,6 +153,7 @@ public class XAdESSignatureValidationModule {
 		CertificateValidationProvider certValidator = null;
 		
 		try {
+			/** Implementation of CertificateValidationProvider using a PKIX CertPathBuilder */
 			certValidator = new PKIXCertificateValidationProvider(trustAnchors, false, certStore.getStore());
 		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
 			e.printStackTrace();

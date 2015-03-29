@@ -83,7 +83,7 @@ public class GenEnvXAdESSignature {
         XadesSignatureResult result = signer.sign(alldata, sigParent);
         
          //Output Report
-        XAdESSignatureVerifier sv = new XAdESSignatureVerifier(result);
+        XAdESSignatureValidation sv = new XAdESSignatureValidation(result);
         sv.genSigVerifyForm();
         
         writeSignedDocumentToFile(source);

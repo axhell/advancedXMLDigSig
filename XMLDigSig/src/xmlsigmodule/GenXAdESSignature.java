@@ -13,43 +13,52 @@ import xades4j.production.XadesSigner;
 import xades4j.properties.CommitmentTypeProperty;
 import xades4j.properties.DataObjectDesc;
 import xades4j.properties.DataObjectFormatProperty;
-
+/**
+ * build a XAdES-BES signature 
+ */
 public class GenXAdESSignature {
     String firstRef;
     String secondRef;
     String baseUri;
-	
+	/**
+	 * Class constructor
+	 * @param cminstfn CM instance relative path
+	 * @param cmtfn CM template relative path
+	 * @param baseUri URI absolute path 
+	 */
     public GenXAdESSignature(String cminstfn, String cmtfn, String baseUri) {
 		this.firstRef = cminstfn;
 		this.secondRef = cmtfn;
 		this.baseUri = baseUri;
 	}
-
+    /**
+     * Build a XAdES-BES signature for Certification Model 
+     * Instance 
+     * @param signer
+     * @return Document signature
+     * @throws Exception
+     */
 	public Document signCMiXAdESBES(XadesSigner signer) throws Exception {
 		/**
-		 * Add Certification Model instance to reference
+		 * Add Certification Model instance as object reference to the signature
 		 * Commitment types proof of origin defined in ETSI TS 101 903 V1.4.1 (2009-06)
+		 * specify MIME type
 		 */
 		DataObjectDesc cminst = new DataObjectReference(this.firstRef)
-		.withTransform(XPath2Filter.intersect("/"))
-		.withDataObjectFormat(new DataObjectFormatProperty("application/xml"))//MimeType
-		.withCommitmentType(CommitmentTypeProperty.proofOfOrigin())//Signer is creator of the reference
+		.withTransform(XPath2Filter.intersect("//*"))
+		.withDataObjectFormat(new DataObjectFormatProperty("application/xml"))
+		.withCommitmentType(CommitmentTypeProperty.proofOfOrigin())
 		;
 	
-		/**
-		 * Add Certification Model Template to reference
-		 * Commitment types proof of origin defined in ETSI TS 101 903 V1.4.1 (2009-06)
-		 */
+		/** Add Certification Model Template to object reference*/
 		DataObjectDesc cmtemp = new DataObjectReference(this.secondRef)
-		.withTransform(XPath2Filter.intersect("/"))
-		.withDataObjectFormat(new DataObjectFormatProperty("application/xml"))//MimeTipe qualify
-		.withCommitmentType(CommitmentTypeProperty.proofOfApproval())//Signer approved only the reference
+		.withTransform(XPath2Filter.intersect("//*"))
+		.withDataObjectFormat(new DataObjectFormatProperty("application/xml"))
+		.withCommitmentType(CommitmentTypeProperty.proofOfApproval())
 		;
 		
 		
-		/**
-		 * Create the final signed object with base uri declaration enable relative uri
-		 */
+		/** Create the final signed object with base URI declaration enable relative URI */
 		SignedDataObjects alldata = new SignedDataObjects()
 				.withSignedDataObject(cminst).withBaseUri(this.baseUri)
 				.withSignedDataObject(cmtemp).withBaseUri(this.baseUri)
@@ -57,7 +66,7 @@ public class GenXAdESSignature {
 		
 		
 		
-		// Create the Document that will hold the resulting XMLSignature
+		/** Create the Document that will hold the resulting XMLSignature */
 		DocumentBuilderFactory sigdbf = DocumentBuilderFactory.newInstance();
         sigdbf.setNamespaceAware(true);
         Document sigdoc = sigdbf.newDocumentBuilder().newDocument();
@@ -69,21 +78,19 @@ public class GenXAdESSignature {
 			e.printStackTrace();
 		}
         
-        XAdESSignatureVerifier sv = new XAdESSignatureVerifier(result);
+        XAdESSignatureValidation sv = new XAdESSignatureValidation(result);
         sv.genSigVerifyForm();
         
-        //output the resulting document
+        /** output the resulting document */
 		return sigdoc;
 	}
 	
 	
 	
 	
-//cancella metodo
+/** cancella metodo
 	public Document signCMtempXAdESBES(XadesSigner signer) throws Exception {
-		/**
-		 * Add the object reference to the signature
-		 */
+		
 		DataObjectDesc cmtemp = new DataObjectReference(this.firstRef)
 		.withTransform(XPath2Filter.union("/*"))
 		.withDataObjectFormat(new DataObjectFormatProperty("application/xml"))//MimeTipe qualifying properties
@@ -95,10 +102,7 @@ public class GenXAdESSignature {
 				.withBaseUri(this.baseUri)
 				//.withTransform(new  );
 				;
-		/**
-		* Commitment types defined in ETSI TS 101 903 V1.4.1 (2009-06).
-		* section 7.2.6.
-		*/
+		
 		
 		
 		// Create the Document that will hold the resulting XMLSignature
@@ -109,7 +113,7 @@ public class GenXAdESSignature {
 		
         XadesSignatureResult result = signer.sign(alldata, sigdoc);
         
-        XAdESSignatureVerifier sv = new XAdESSignatureVerifier(result);
+        XAdESSignatureValidation sv = new XAdESSignatureValidation(result);
         sv.genSigVerifyForm();
         
         
@@ -122,6 +126,6 @@ public class GenXAdESSignature {
         
      
 	}
-	
+	*/
 
 }

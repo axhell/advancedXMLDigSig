@@ -1,45 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Partitions>
-	<Section id="1">
-	<XPath xmlns="http://www.w3.org/2002/06/xmldsig-filter2" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" Filter="union">
-      \element1\
-		</XPath>
-		<XPath xmlns="http://www.w3.org/2002/06/xmldsig-filter2" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" Filter="subtract">
-      \element1\ref\@URI
-		</XPath>
-	</Section>
-		<Section id="2">
-	<XPath xmlns="http://www.w3.org/2002/06/xmldsig-filter2" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" Filter="union">
-      \element1\ref\@URI
-		</XPath>		
-	</Section>
-		<Section id="3">
-		<XPath xmlns="http://www.w3.org/2002/06/xmldsig-filter2" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" Filter="subtract">
-      here()/ancestor::dsig:Signature[1]
-		</XPath>		
-	</Section>
-<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="xmldsig-1ac07f55-8e6c-4c67-98b6-7457b5955837">
+<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="xmldsig-4f275cd5-2d40-4fb2-99d6-8842872c0d63">
 <ds:SignedInfo>
 <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
 <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-<ds:Reference Id="xmldsig-1ac07f55-8e6c-4c67-98b6-7457b5955837-ref0" URI="">
+<ds:Reference Id="xmldsig-4f275cd5-2d40-4fb2-99d6-8842872c0d63-ref0" URI="CMtemp.xml">
 <ds:Transforms>
-<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<ds:Transform Algorithm="http://www.w3.org/2002/06/xmldsig-filter2">
+<dsig-xpath:XPath xmlns:dsig-xpath="http://www.w3.org/2002/06/xmldsig-filter2" Filter="union">/*</dsig-xpath:XPath>
+</ds:Transform>
 </ds:Transforms>
 <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
 <ds:DigestValue>NO4buuFZs8UoACpgD2Ufjxb/TPpkGWfe0M0beqhDB68=</ds:DigestValue>
 </ds:Reference>
-<ds:Reference Type="http://uri.etsi.org/01903#SignedProperties" URI="#xmldsig-1ac07f55-8e6c-4c67-98b6-7457b5955837-signedprops">
+<ds:Reference Type="http://uri.etsi.org/01903#SignedProperties" URI="#xmldsig-4f275cd5-2d40-4fb2-99d6-8842872c0d63-signedprops">
 <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
-<ds:DigestValue>BuEowIfZwEONbv2Ir8yg+YQyPNclzmqLkE/X9SLTcuA=</ds:DigestValue>
+<ds:DigestValue>0BLgqvsJCpcZxsFYUGgqBLJLqS3ETALNEV/u1CNFDOo=</ds:DigestValue>
 </ds:Reference>
 </ds:SignedInfo>
-<ds:SignatureValue Id="xmldsig-1ac07f55-8e6c-4c67-98b6-7457b5955837-sigvalue">
-GjiJGGPyJVE2rYWMnovU9NQfR+7XvIPTu+TKrBqpVP2cOxh8smDPPVfmQqeOLyiu3zFTo7L3LO/Y
-54csEpAsoqx6T0VcCd8Xhd0c0HBR4dBzKcfDFG+k0iRTcp+lL8mfvLgCJt/RgIEOZBQNqVMaAlJl
-kfSJ4KxSefWe7tIPU0oglFpDpnpzySRGHyrFQtZFnv1titSVdEch57Xb+fTeBXOLWggrOWQqS3S6
-chio86BPPUhZXZFbGQjfbMoHB8ROwJ++L3TRgo4AIlQqTF59Chic+SOHH8yQzEcDLXv5moXZWgfE
-oX4jM2r+KJIA9WTUVrLooDV9CKz/TEBsow35OQ==
+<ds:SignatureValue Id="xmldsig-4f275cd5-2d40-4fb2-99d6-8842872c0d63-sigvalue">
+OlnsrSJfJsL89GU7BqprlF1IGXf/SZKgHqaxLYM+QJ9DStcNJXdjDLNrqoKtlQfGCwX7dP/KJxiJ
+mMGbWKfZiZJMmn/6jHwYDy5doOiGb0D7ifahGuTBDMga9usDp8i55w9AalG11bXwcVr9TGnO2KIy
+TfIPCrGPcuv2gKW7Rh1msGU0trwc9ffS+9jF45Oge1kuDOgZ4CI27EwRlcopAGWFTRYTW2mHaN4q
+FQbXjJ4u55DoyatzW6J/AOYOnYZa3wn/z3zUhQ0NdcBXlLNFsj3VqFX1uokO+QjCCg0U+ZezbraA
+QXAC3hFfiO5d290YsMpJgA5n9Zk0AyEh369rHQ==
 </ds:SignatureValue>
 <ds:KeyInfo>
 <ds:X509Data>
@@ -64,10 +47,10 @@ xZ9ZKg88NvHCCg29i7qgo0g8+bfWDliqRMAQ8x4=
 </ds:X509Data>
 </ds:KeyInfo>
 <ds:Object>
-<xades:QualifyingProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" xmlns:xades141="http://uri.etsi.org/01903/v1.4.1#" Target="#xmldsig-1ac07f55-8e6c-4c67-98b6-7457b5955837">
-<xades:SignedProperties Id="xmldsig-1ac07f55-8e6c-4c67-98b6-7457b5955837-signedprops">
+<xades:QualifyingProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" xmlns:xades141="http://uri.etsi.org/01903/v1.4.1#" Target="#xmldsig-4f275cd5-2d40-4fb2-99d6-8842872c0d63">
+<xades:SignedProperties Id="xmldsig-4f275cd5-2d40-4fb2-99d6-8842872c0d63-signedprops">
 <xades:SignedSignatureProperties>
-<xades:SigningTime>2015-03-21T12:47:34.306+01:00</xades:SigningTime>
+<xades:SigningTime>2015-03-25T20:56:19.171+01:00</xades:SigningTime>
 <xades:SigningCertificate>
 <xades:Cert>
 <xades:CertDigest>
@@ -82,16 +65,18 @@ xZ9ZKg88NvHCCg29i7qgo0g8+bfWDliqRMAQ8x4=
 </xades:SigningCertificate>
 </xades:SignedSignatureProperties>
 <xades:SignedDataObjectProperties>
+<xades:DataObjectFormat ObjectReference="#xmldsig-4f275cd5-2d40-4fb2-99d6-8842872c0d63-ref0">
+<xades:MimeType>application/xml</xades:MimeType>
+</xades:DataObjectFormat>
 <xades:CommitmentTypeIndication>
 <xades:CommitmentTypeId>
 <xades:Identifier>http://uri.etsi.org/01903/v1.2.2#ProofOfOrigin</xades:Identifier>
 <xades:Description>Indicates that the signer recognizes to have created, approved and sent the signed data object</xades:Description>
 </xades:CommitmentTypeId>
-<xades:ObjectReference>#xmldsig-1ac07f55-8e6c-4c67-98b6-7457b5955837-ref0</xades:ObjectReference>
+<xades:ObjectReference>#xmldsig-4f275cd5-2d40-4fb2-99d6-8842872c0d63-ref0</xades:ObjectReference>
 </xades:CommitmentTypeIndication>
 </xades:SignedDataObjectProperties>
 </xades:SignedProperties>
 </xades:QualifyingProperties>
 </ds:Object>
 </ds:Signature>
-</Partitions>

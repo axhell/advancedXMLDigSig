@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="xmldsig-0a4ee6f3-479b-44fd-8430-30c0a4546585">
+<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="xmldsig-b080d31d-86da-42c6-ad80-514af8bb5105">
 <ds:SignedInfo>
 <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
 <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-<ds:Reference Id="xmldsig-0a4ee6f3-479b-44fd-8430-30c0a4546585-ref0" URI="CMinstance.xml">
+<ds:Reference Id="xmldsig-b080d31d-86da-42c6-ad80-514af8bb5105-ref0" URI="CMinstance.xml">
 <ds:Transforms>
 <ds:Transform Algorithm="http://www.w3.org/2002/06/xmldsig-filter2">
-<dsig-xpath:XPath xmlns:dsig-xpath="http://www.w3.org/2002/06/xmldsig-filter2" Filter="intersect">/</dsig-xpath:XPath>
+<dsig-xpath:XPath xmlns:dsig-xpath="http://www.w3.org/2002/06/xmldsig-filter2" Filter="intersect">//*</dsig-xpath:XPath>
 </ds:Transform>
 </ds:Transforms>
 <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
-<ds:DigestValue>wIS/ClgPBhFSwenu+4bZ9Afx0Z3DlgQqmrUqh03Dj2I=</ds:DigestValue>
+<ds:DigestValue>NO4buuFZs8UoACpgD2Ufjxb/TPpkGWfe0M0beqhDB68=</ds:DigestValue>
 </ds:Reference>
-<ds:Reference Id="xmldsig-0a4ee6f3-479b-44fd-8430-30c0a4546585-ref1" URI="CMtemp.xml">
+<ds:Reference Id="xmldsig-b080d31d-86da-42c6-ad80-514af8bb5105-ref1" URI="CMtemp.xml">
 <ds:Transforms>
 <ds:Transform Algorithm="http://www.w3.org/2002/06/xmldsig-filter2">
-<dsig-xpath:XPath xmlns:dsig-xpath="http://www.w3.org/2002/06/xmldsig-filter2" Filter="intersect">/</dsig-xpath:XPath>
+<dsig-xpath:XPath xmlns:dsig-xpath="http://www.w3.org/2002/06/xmldsig-filter2" Filter="intersect">//*</dsig-xpath:XPath>
 </ds:Transform>
 </ds:Transforms>
 <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
-<ds:DigestValue>wIS/ClgPBhFSwenu+4bZ9Afx0Z3DlgQqmrUqh03Dj2I=</ds:DigestValue>
+<ds:DigestValue>NO4buuFZs8UoACpgD2Ufjxb/TPpkGWfe0M0beqhDB68=</ds:DigestValue>
 </ds:Reference>
-<ds:Reference Type="http://uri.etsi.org/01903#SignedProperties" URI="#xmldsig-0a4ee6f3-479b-44fd-8430-30c0a4546585-signedprops">
+<ds:Reference Type="http://uri.etsi.org/01903#SignedProperties" URI="#xmldsig-b080d31d-86da-42c6-ad80-514af8bb5105-signedprops">
 <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
-<ds:DigestValue>BYkFzK+R+F9kPkYbHVN8DgE5YEc/y06vRK3X2n5cI6w=</ds:DigestValue>
+<ds:DigestValue>4pmmFHXc0H4dslZaQ3rq4Naa17y7p3tKfvKi8AvBwpI=</ds:DigestValue>
 </ds:Reference>
 </ds:SignedInfo>
-<ds:SignatureValue Id="xmldsig-0a4ee6f3-479b-44fd-8430-30c0a4546585-sigvalue">
-YoFuXXFmLQd2KEj222eX0wp3hgksSDhrOxWhHIPDfNSYl8hCB4khZHSRP2wL3XF+ke2gAOsUP/QU
-otCwbmWXlQGF0mo4x3NWmMbzi9sxoxph+4l/N1bitDdnTlvErZmAvbGZqbVPks9PXjEukjDm3g5J
-C50uhv55CrQVLwjN5X/nSF1ODZmXiU3xht2z3To+eFpu1yD/uRgbNTTP5jWqSH0+FE9LU2xvxkap
-Fdeu3jKqnRmOR9eU8riFAZg0NC0Km5NHgz53W+c1zAq2j2FOged4w25xRdfwC4O/RRF/RuEuYMJX
-G1eUWAmEE8NAIemcTBTjCWP1P+PDflygJBsXlg==
+<ds:SignatureValue Id="xmldsig-b080d31d-86da-42c6-ad80-514af8bb5105-sigvalue">
+LK+CUl2kOsdJ09tYxt43QNRlGjOW/GbCQ/Hezln9z/TyVEWDxfNkttWKL4K60FXG1s9/awxU84XN
+XJFnvUOp4UqM/TGjRUkyFN0G3VXsAdujuOnoF70JsbqnXyCIO7VxXGf0HRn0pUqui9YCh/IpEr6Y
+p86StTwSouoGNdg7F0gJBfwsd4g6puWYbnvVSCnbJ9wtFMCMi9ef0X0T8Fdxm/Y0BtWuqso4+AKW
+bsNB7fIHHPglobEZogBinvsqp7Wwt/pIyEeLmH9fZfHzwHhtfpBcJnlWACzrvumkn6ZRsLsi9yCC
+3dAFqUAq7sfMlQQiTRw7HkpDnWVcrYxdH/EhRQ==
 </ds:SignatureValue>
 <ds:KeyInfo>
 <ds:X509Data>
@@ -60,10 +60,10 @@ zul4+uvyzHZ6r5CDoNb2UGuM7np8ZYKDksMRmV9kdU1a
 </ds:X509Data>
 </ds:KeyInfo>
 <ds:Object>
-<xades:QualifyingProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" xmlns:xades141="http://uri.etsi.org/01903/v1.4.1#" Target="#xmldsig-0a4ee6f3-479b-44fd-8430-30c0a4546585">
-<xades:SignedProperties Id="xmldsig-0a4ee6f3-479b-44fd-8430-30c0a4546585-signedprops">
+<xades:QualifyingProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" xmlns:xades141="http://uri.etsi.org/01903/v1.4.1#" Target="#xmldsig-b080d31d-86da-42c6-ad80-514af8bb5105">
+<xades:SignedProperties Id="xmldsig-b080d31d-86da-42c6-ad80-514af8bb5105-signedprops">
 <xades:SignedSignatureProperties>
-<xades:SigningTime>2015-03-25T16:19:59.005+01:00</xades:SigningTime>
+<xades:SigningTime>2015-03-26T19:41:07.732+01:00</xades:SigningTime>
 <xades:SigningCertificate>
 <xades:Cert>
 <xades:CertDigest>
@@ -78,10 +78,10 @@ zul4+uvyzHZ6r5CDoNb2UGuM7np8ZYKDksMRmV9kdU1a
 </xades:SigningCertificate>
 </xades:SignedSignatureProperties>
 <xades:SignedDataObjectProperties>
-<xades:DataObjectFormat ObjectReference="#xmldsig-0a4ee6f3-479b-44fd-8430-30c0a4546585-ref1">
+<xades:DataObjectFormat ObjectReference="#xmldsig-b080d31d-86da-42c6-ad80-514af8bb5105-ref1">
 <xades:MimeType>application/xml</xades:MimeType>
 </xades:DataObjectFormat>
-<xades:DataObjectFormat ObjectReference="#xmldsig-0a4ee6f3-479b-44fd-8430-30c0a4546585-ref0">
+<xades:DataObjectFormat ObjectReference="#xmldsig-b080d31d-86da-42c6-ad80-514af8bb5105-ref0">
 <xades:MimeType>application/xml</xades:MimeType>
 </xades:DataObjectFormat>
 <xades:CommitmentTypeIndication>
@@ -89,14 +89,14 @@ zul4+uvyzHZ6r5CDoNb2UGuM7np8ZYKDksMRmV9kdU1a
 <xades:Identifier>http://uri.etsi.org/01903/v1.2.2#ProofOfApproval</xades:Identifier>
 <xades:Description>Indicates that the signer has approved the content of the signed data object</xades:Description>
 </xades:CommitmentTypeId>
-<xades:ObjectReference>#xmldsig-0a4ee6f3-479b-44fd-8430-30c0a4546585-ref1</xades:ObjectReference>
+<xades:ObjectReference>#xmldsig-b080d31d-86da-42c6-ad80-514af8bb5105-ref1</xades:ObjectReference>
 </xades:CommitmentTypeIndication>
 <xades:CommitmentTypeIndication>
 <xades:CommitmentTypeId>
 <xades:Identifier>http://uri.etsi.org/01903/v1.2.2#ProofOfOrigin</xades:Identifier>
 <xades:Description>Indicates that the signer recognizes to have created, approved and sent the signed data object</xades:Description>
 </xades:CommitmentTypeId>
-<xades:ObjectReference>#xmldsig-0a4ee6f3-479b-44fd-8430-30c0a4546585-ref0</xades:ObjectReference>
+<xades:ObjectReference>#xmldsig-b080d31d-86da-42c6-ad80-514af8bb5105-ref0</xades:ObjectReference>
 </xades:CommitmentTypeIndication>
 </xades:SignedDataObjectProperties>
 </xades:SignedProperties>

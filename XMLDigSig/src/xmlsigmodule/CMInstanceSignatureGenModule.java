@@ -138,7 +138,8 @@ public class CMInstanceSignatureGenModule {
 		System.out.println("User certificate validation:");
 		boolean ucert = certUser.Validate(certCA.cert);
 		
-		//elimina da qui
+		/**
+		 * //elimina da qui
 		System.out.println();
 		System.out.println("Certification Model Template signature validation: ");
 		//create CM template signature for test only
@@ -150,7 +151,8 @@ public class CMInstanceSignatureGenModule {
 		writeSignedDocumentToFile(sigCMT);
 		//a qui		
 		//Cambia sigCMT con cmtsignature
-		XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(sigCMT , certCA.cert, PATH);
+		*/
+		XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(cmtsignature , certCA.cert, PATH);
 		boolean cmt = vv.validate();  
 		
 		System.out.println();		
