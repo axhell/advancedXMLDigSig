@@ -88,7 +88,7 @@ public class GenXAdESSignature {
 	
 	
 	
-/** cancella metodo
+
 	public Document signCMtempXAdESBES(XadesSigner signer) throws Exception {
 		
 		DataObjectDesc cmtemp = new DataObjectReference(this.firstRef)
@@ -126,6 +126,6 @@ public class GenXAdESSignature {
         
      
 	}
-	*/
+	
 
 }

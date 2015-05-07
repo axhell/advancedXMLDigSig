@@ -7,7 +7,6 @@ import java.security.cert.X509Certificate;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -27,6 +26,55 @@ import xmlsigcore.RSAPrivateKeyReader;
 
 
 public class CMInstanceSignatureGenModule {
+	
+	X509CertificateValidation certCA = null;
+	X509CertificateValidation certUser = null;
+	 
+	String cmtempfn; 
+	String cminstfn; 
+	String cmtsignatureFN;
+	String absolutePath; 
+	PrivateKey privKuser;
+	
+	
+	
+	public CMInstanceSignatureGenModule(String certCAfile, String certUserfile,
+			String cmtempfn, String cminstfn, String cmtsignatureFN,
+			String absolutePath, String privKuser) {
+		
+		
+		try {
+			this.certCA = new X509CertificateValidation(new FileInputStream(certCAfile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			this.certUser = new X509CertificateValidation(new FileInputStream(certUserfile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+		try {
+			this.privKuser = RSAPrivateKeyReader.getPrivKeyFromFile(privKuser);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		this.cmtempfn = cmtempfn;
+		this.cminstfn = cminstfn;
+		this.cmtsignatureFN = cmtsignatureFN;
+		this.absolutePath = absolutePath;
+		
+		
+	}
+
+
+
+
+
 	/**
 	 * Test class to collect input needed to Certification Model Instance signature process
 	 * @throws Exception
@@ -128,7 +176,7 @@ public class CMInstanceSignatureGenModule {
 		}
 		
 		
-		//CM template verifica
+	
 		
 		inStream.close();
 		
@@ -139,7 +187,6 @@ public class CMInstanceSignatureGenModule {
 		boolean ucert = certUser.Validate(certCA.cert);
 		
 		/**
-		 * //elimina da qui
 		System.out.println();
 		System.out.println("Certification Model Template signature validation: ");
 		//create CM template signature for test only
@@ -149,8 +196,6 @@ public class CMInstanceSignatureGenModule {
 		//Sign
 		Document sigCMT = newSig.signCMtempXAdESBES(signerCMT);
 		writeSignedDocumentToFile(sigCMT);
-		//a qui		
-		//Cambia sigCMT con cmtsignature
 		*/
 		XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(cmtsignature , certCA.cert, PATH);
 		boolean cmt = vv.validate();  
@@ -160,7 +205,7 @@ public class CMInstanceSignatureGenModule {
 		
 		
 		/**
-		 * Enable signature process only if 
+		 * CM instance signature process only if 
 		 * trust anchor's certificate AND user's certificate AND CM template's signature
 		 * are valid.
 		 */
@@ -254,4 +299,72 @@ public class CMInstanceSignatureGenModule {
 		}
 		
     }
+
+
+
+
+
+	public Document sign() throws Exception {
+		
+		System.out.println("Trust Anchor certificate validation:");
+		boolean tacert = this.certCA.Validate(this.certCA.cert);
+		System.out.println();
+		System.out.println("User certificate validation:");
+		boolean ucert = this.certUser.Validate(this.certCA.cert);
+		
+		System.out.println();
+		System.out.println("Certification Model Template signature validation: ");
+		//create CM template signature for test only
+		//Get CA's private key
+		PrivateKey privKCA = null;
+		try {
+			privKCA = RSAPrivateKeyReader.getPrivKeyFromFile("cert/ca_rsa_priveKey.der");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		XadesSigner signerCMT = getSigner(this.certCA.cert, privKCA);
+		//genara firma
+		GenXAdESSignature newSig = new GenXAdESSignature(this.cmtempfn , null, this.absolutePath);
+		//Sign
+		Document sigCMT = newSig.signCMtempXAdESBES(signerCMT);
+		//writeSignedDocumentToFile(sigCMT);
+		
+		XAdESSignatureValidationModule vv = new XAdESSignatureValidationModule(sigCMT , this.certCA.cert, this.absolutePath);
+		boolean cmt = vv.validate();  
+		
+		System.out.println();
+		
+		
+		
+		/**
+		 * CM instance signature process only if 
+		 * trust anchor's certificate AND user's certificate AND CM template's signature
+		 * are valid.
+		 */
+		Document sigCMI = null;
+		if(tacert && ucert && cmt){
+			
+			/** Create a signer for the Certification Model Instance */
+			XadesSigner signerCMI = getSigner(this.certUser.cert, this.privKuser);
+			/** Generate the signature content */
+			GenXAdESSignature newSigI = new GenXAdESSignature(this.cminstfn, this.cmtempfn, this.absolutePath);
+			/** Sign */
+			sigCMI = newSigI.signCMiXAdESBES(signerCMI);
+			System.out.println();
+			System.out.println("Certification Model Instance signature validation: ");
+			XAdESSignatureValidationModule vi = new XAdESSignatureValidationModule(sigCMI , this.certCA.cert, this.absolutePath);
+				if(vi.validate()){
+					//writeSignedDocumentToFile(sigCMI);
+					System.out.println();
+					System.out.println("Certification Model Instance signed correctly");
+					
+				}	
+		}else{
+			System.out.println();
+			System.out.println("Error, Certification Model Instance not signed");
+		}
+		
+		return sigCMI;
+	}
 }
